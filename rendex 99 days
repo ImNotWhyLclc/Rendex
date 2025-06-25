@@ -1,0 +1,271 @@
+-- Rendex 99 Days – Obsidian UI Script (v2.0)
+local HttpService = game:GetService("HttpService")
+local player      = game.Players.LocalPlayer
+local camera      = workspace.CurrentCamera
+
+-- Load Obsidian UI Library
+local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+local Library = loadstring(game:HttpGet(repo.."Library.lua"))()
+
+-- Version footer
+local version = "v2.0"
+Library:Notify({ Title = "Rendex UI", Description = "Loaded " .. version, Time = 4 })
+
+-- UI Window
+local Window = Library:CreateWindow({
+    Title             = "Rendex 99 Days",
+    Footer            = version,
+    Icon              = 133108410402735,
+    Size              = UDim2.fromOffset(550, 650),
+    Theme             = "Dark",
+    Center            = true,
+    AutoShow          = true,
+    MobileButtonsSide = "Left",
+})
+
+local Tabs = {
+    Combat   = Window:AddTab("Combat",   "bolt"),
+    ESP      = Window:AddTab("ESP",      "eye"),
+    Items    = Window:AddTab("Items",    "box"),
+    Settings = Window:AddTab("Settings", "settings"),
+}
+
+-- Settings
+local settings = {
+    autoKill = false,
+    autoBreak = false,
+    mode = "Legit",
+    speed = 1.0,
+    breakSpeed = 1.0,
+    useCheckboxes = true,
+}
+local espSettings = { players = false, lostChild = false, deer = false }
+local selectedItems, bringingItems = {}, false
+local espObjects = {}
+
+-- Get best weapon
+local function getWeapon()
+    local inv = player:FindFirstChild("Inventory")
+    return inv and (inv:FindFirstChild("Spear")
+        or inv:FindFirstChild("Strong Axe")
+        or inv:FindFirstChild("Good Axe")
+        or inv:FindFirstChild("Old Axe"))
+end
+
+-- ESP Helpers
+local function clearESP()
+    for _, o in ipairs(espObjects) do
+        if o and o.Parent then o:Destroy() end
+    end
+    espObjects = {}
+end
+
+local function addESP(model, label)
+    local root = model:FindFirstChild("HumanoidRootPart") or model:FindFirstChildWhichIsA("BasePart")
+    if not root then return end
+
+    local hl = Instance.new("Highlight", model)
+    hl.FillColor = Color3.fromRGB(255, 100, 100)
+    hl.OutlineColor = Color3.new(0, 0, 0)
+    hl.FillTransparency = 0.6
+    hl.OutlineTransparency = 0
+
+    local bb = Instance.new("BillboardGui", root)
+    bb.Size = UDim2.new(0, 120, 0, 24)
+    bb.StudsOffset = Vector3.new(0, 3.5, 0)
+    bb.AlwaysOnTop = true
+
+    local txt = Instance.new("TextLabel", bb)
+    txt.Size = UDim2.new(1, 0, 1, 0)
+    txt.BackgroundTransparency = 1
+    txt.Text = label
+    txt.TextColor3 = Color3.new(1, 1, 1)
+    txt.TextScaled = true
+    txt.Font = Enum.Font.GothamBold
+    Instance.new("UIStroke", txt).Color = Color3.new(0, 0, 0)
+
+    table.insert(espObjects, hl)
+    table.insert(espObjects, bb)
+end
+
+-- Toggle control (checkbox or toggle)
+local function AddToggleControl(groupbox, id, info)
+    if settings.useCheckboxes then
+        return groupbox:AddCheckbox(id, info)
+    else
+        return groupbox:AddToggle(id, info)
+    end
+end
+
+-- Combat Tab
+do
+    local L1 = Tabs.Combat:AddLeftGroupbox("Auto Kill")
+    local L2 = Tabs.Combat:AddRightGroupbox("Auto Break")
+
+    local autoKillToggle = AddToggleControl(L1, "AutoKill", {
+        Text = "Auto Kill", Default = false,
+        Tooltip = "Lower = Faster",
+        Callback = function(v) settings.autoKill = v end
+    })
+    autoKillToggle:OnChanged(function(v) settings.autoKill = v end)
+
+    L1:AddDropdown("Mode", {
+        Values = {"Legit", "Unlegit"},
+        Default = 1, Text = "Mode",
+        Callback = function(v) settings.mode = v end
+    })
+
+    L1:AddSlider("Speed", {
+        Text = "Kill Speed", Min = 0.1, Max = 1.0,
+        Default = 1.0, Rounding = 2,
+        Callback = function(v) settings.speed = v end
+    })
+
+    local autoBreakToggle = AddToggleControl(L2, "AutoBreak", {
+        Text = "Auto Break", Default = false,
+        Tooltip = "Lower = Faster",
+        Callback = function(v) settings.autoBreak = v end
+    })
+    autoBreakToggle:OnChanged(function(v) settings.autoBreak = v end)
+
+    L2:AddSlider("BreakSpeed", {
+        Text = "Break Speed", Min = 0.1, Max = 1.0,
+        Default = 1.0, Rounding = 2,
+        Callback = function(v) settings.breakSpeed = v end
+    })
+
+    L1:AddLabel("Better weapon = faster hits")
+    L2:AddLabel("Better weapon = faster hits")
+end
+
+-- ESP Tab
+do
+    local EG = Tabs.ESP:AddLeftGroupbox("ESP")
+
+    AddToggleControl(EG, "ESPPlayers", {
+        Text = "Player ESP", Default = false,
+        Callback = function(v) espSettings.players = v end
+    })
+
+    AddToggleControl(EG, "ESPChild", {
+        Text = "Lost Child ESP", Default = false,
+        Callback = function(v) espSettings.lostChild = v end
+    })
+
+    AddToggleControl(EG, "ESPDeer", {
+        Text = "Deer ESP", Default = false,
+        Callback = function(v) espSettings.deer = v end
+    })
+end
+
+-- Items Tab
+do
+    local IG = Tabs.Items:AddLeftGroupbox("Crafting")
+
+    IG:AddDropdown("CraftItems", {
+        Values = {"Bolt", "Sheet Metal", "Broken Fan", "Broken Microwave"},
+        Multi = true, Text = "Select Items",
+        Callback = function(v) selectedItems = v end
+    })
+
+    AddToggleControl(IG, "BringItems", {
+        Text = "Bring Crafting Items", Default = false,
+        Callback = function(v) bringingItems = v end
+    })
+end
+
+-- Settings Tab
+do
+    local SG = Tabs.Settings:AddLeftGroupbox("Settings")
+
+    SG:AddButton("Toggle Toggle Style", function()
+        settings.useCheckboxes = not settings.useCheckboxes
+        Library:Notify("Reload UI to apply checkbox/toggle style")
+    end)
+
+    SG:AddButton("Unload UI", function()
+        clearESP()
+        Library:Unload()
+    end)
+end
+
+-- ESP Loop
+task.spawn(function()
+    while task.wait(2) do
+        clearESP()
+        if espSettings.players then
+            for _, p in ipairs(game.Players:GetPlayers()) do
+                if p ~= player and p.Character then
+                    addESP(p.Character, p.DisplayName)
+                end
+            end
+        end
+        if espSettings.lostChild then
+            for i = 1, 4 do
+                local c = workspace.Characters:FindFirstChild("Lost Child " .. i)
+                if c then addESP(c, "Lost Child " .. i) end
+            end
+        end
+        if espSettings.deer then
+            local d = workspace.Characters:FindFirstChild("Deer")
+            if d then addESP(d, "Deer") end
+        end
+    end
+end)
+
+-- Main loop
+task.spawn(function()
+    while task.wait(0.1) do
+        if settings.autoKill then
+            local weapon = getWeapon()
+            if weapon then
+                local maxRange = settings.mode == "Legit" and 15 or 40
+                for _, model in ipairs(workspace.Characters:GetChildren()) do
+                    if model:IsA("Model") and model ~= player.Character then
+                        local root = model:FindFirstChild("HumanoidRootPart") or model:FindFirstChildWhichIsA("BasePart")
+                        if root then
+                            local dist = (camera.CFrame.Position - root.Position).Magnitude
+                            local dot = camera.CFrame.LookVector:Dot((root.Position - camera.CFrame.Position).Unit)
+                            if dot > 0.6 and dist <= maxRange then
+                                game:GetService("ReplicatedStorage").RemoteEvents.ToolDamageObject:InvokeServer(
+                                    model, weapon, "3_7591937906", root.CFrame
+                                )
+                                break
+                            end
+                        end
+                    end
+                end
+            end
+            task.wait(settings.speed)
+        end
+
+        if settings.autoBreak then
+            local weapon = getWeapon()
+            if weapon then
+                local ray = workspace:Raycast(camera.CFrame.Position, camera.CFrame.LookVector * 15)
+                if ray and ray.Instance and ray.Instance.Name == "Trunk" then
+                    game:GetService("ReplicatedStorage").RemoteEvents.ToolDamageObject:InvokeServer(
+                        ray.Instance.Parent, weapon, "4_7591937906", CFrame.new(ray.Position)
+                    )
+                end
+            end
+            task.wait(settings.breakSpeed)
+        end
+
+        if bringingItems and player.Character and #selectedItems > 0 then
+            local root = player.Character:FindFirstChild("HumanoidRootPart")
+            if root then
+                for _, model in ipairs(workspace.Items:GetChildren()) do
+                    if table.find(selectedItems, model.Name) then
+                        local main = model:FindFirstChild("Main") or model.PrimaryPart
+                        if main then
+                            if not model.PrimaryPart then model.PrimaryPart = main end
+                            model:PivotTo(root.CFrame * CFrame.new(0,0,-3))
+                            model.PrimaryPart = nil
+                        end
+                    end
+                end
+            end
+        end
+    end
+end)
