@@ -1,0 +1,264 @@
+-- Rendex 99 Days – Obsidian UI Script (v2.9)
+local HttpService    = game:GetService("HttpService")
+local Players        = game:GetService("Players")
+local Replicated     = game:GetService("ReplicatedStorage")
+local Workspace      = game:GetService("Workspace")
+local LocalPlayer    = Players.LocalPlayer
+local Camera         = Workspace.CurrentCamera
+
+-- Load Obsidian UI Library
+local repo    = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+local Library = loadstring(game:HttpGet(repo.."Library.lua"))()
+
+-- Version
+local version = "v2.9"
+Library:Notify({ Title = "Rendex UI", Description = "Loaded " .. version, Time = 4 })
+
+-- Window
+local Window = Library:CreateWindow({
+    Title             = "Rendex 99 Days",
+    Footer            = version,
+    Icon              = 133108410402735,
+    Size              = UDim2.fromOffset(550, 650),
+    Theme             = "Dark",
+    Center            = true,
+    AutoShow          = true,
+    MobileButtonsSide = "Left",
+})
+
+-- Tabs
+local Tabs = {
+    Home     = Window:AddTab("Home",     "book"),
+    Combat   = Window:AddTab("Combat",   "bolt"),
+    ESP      = Window:AddTab("ESP",      "eye"),
+    Items    = Window:AddTab("Items",    "box"),
+    Player   = Window:AddTab("Player",   "user"),
+    Settings = Window:AddTab("Settings", "settings"),
+}
+
+-- Changelog
+do
+    local g = Tabs.Home:AddLeftGroupbox("Changelog")
+    g:AddLabel("🟢 v2.9 – Current Version")
+    g:AddLabel("• Fixed Bring Crafting for all Bolts")
+    g:AddLabel("• You can test Bolt behavior now")
+end
+
+-- State
+local state = {
+    useCheckboxes     = true,
+    autoKill          = false,
+    autoBreak         = false,
+    killMode          = "Legit",
+    killSpeed         = 1,
+    breakSpeed        = 1,
+    instantPP         = false,
+    autoStunDeer      = false,
+    expandBunny       = false,
+    bringFood         = false,
+    bringCraftingBolt = false,
+    selectedFood      = "Carrot",
+    fovEnabled        = false,
+    fovValue          = 70,
+}
+
+-- Helpers
+local function getWeapon()
+    local inv = LocalPlayer:FindFirstChild("Inventory")
+    return inv and (inv:FindFirstChild("Spear")
+        or inv:FindFirstChild("Strong Axe")
+        or inv:FindFirstChild("Good Axe")
+        or inv:FindFirstChild("Old Axe"))
+end
+
+local function clearESP()
+    for _, o in pairs(workspace:GetDescendants()) do
+        if o:IsA("Highlight") or o:IsA("BillboardGui") then
+            pcall(function() o:Destroy() end)
+        end
+    end
+end
+
+local function addESP(model, label, healthPct)
+    local root = model:FindFirstChild("HumanoidRootPart") or model:FindFirstChildWhichIsA("BasePart")
+    if not root then return end
+
+    local hl = Instance.new("Highlight", model)
+    hl.FillColor = Color3.fromRGB(255,100,100)
+    hl.OutlineColor = Color3.new(0,0,0)
+    hl.FillTransparency = 0.6
+
+    local bg = Instance.new("BillboardGui", root)
+    bg.Size = UDim2.new(0,120,0,36)
+    bg.StudsOffset = Vector3.new(0,4,0)
+    bg.AlwaysOnTop = true
+
+    local txt = Instance.new("TextLabel", bg)
+    txt.Size = UDim2.new(1,0,0.5,0)
+    txt.BackgroundTransparency = 1
+    txt.Text = label
+    txt.TextScaled = true
+    txt.Font = Enum.Font.GothamBold
+    txt.TextColor3 = Color3.new(1,1,1)
+
+    if healthPct then
+        local barBg = Instance.new("Frame", bg)
+        barBg.Position = UDim2.new(0.1,0,0.55,0)
+        barBg.Size = UDim2.new(0.8,0,0.2,0)
+        barBg.BackgroundColor3 = Color3.fromRGB(50,50,50)
+
+        local bar = Instance.new("Frame", barBg)
+        bar.Size = UDim2.new(math.clamp(healthPct,0,1),0,1,0)
+        bar.BackgroundColor3 = healthPct > 0.5 and Color3.fromRGB(0,255,0)
+            or healthPct > 0.25 and Color3.fromRGB(255,255,0)
+            or Color3.fromRGB(255,0,0)
+    end
+end
+
+-- Bring Crafting Bolt function
+local function bringCraftingBolt()
+    local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    for _, model in ipairs(Workspace.Items:GetChildren()) do
+        if model.Name == "Bolt" then
+            if model:FindFirstChild("Main") then
+                model:PivotTo(hrp.CFrame * CFrame.new(0,0,-3))
+            end
+        end
+    end
+end
+
+-- UI Helper
+local function AddControl(group, id, opts)
+    if state.useCheckboxes then
+        return group:AddCheckbox(id, opts)
+    else
+        return group:AddToggle(id, opts)
+    end
+end
+
+-- Combat Tab
+do
+    local A = Tabs.Combat:AddLeftGroupbox("Auto Kill")
+    local B = Tabs.Combat:AddRightGroupbox("Auto Break")
+
+    AddControl(A, "AutoKill", { Text="Auto Kill", Default=false, Callback=function(v) state.autoKill = v end })
+    A:AddDropdown("KillMode", { Values={"Legit","Unlegit"}, Default=1, Text="Mode", Callback=function(v) state.killMode = v end })
+    A:AddSlider("KillSpeed", { Text="Speed", Min=0.1, Max=1, Default=1, Callback=function(v) state.killSpeed = v end })
+
+    AddControl(B, "AutoBreak", { Text="Auto Break", Default=false, Callback=function(v) state.autoBreak = v end })
+    B:AddSlider("BreakSpeed", { Text="Speed", Min=0.1, Max=1, Default=1, Callback=function(v) state.breakSpeed = v end })
+end
+
+-- ESP Tab
+do
+    local G = Tabs.ESP:AddLeftGroupbox("ESP")
+    AddControl(G, "ESPPlayers", { Text="Player ESP", Callback=function(v) state.espPlayers = v end })
+    AddControl(G, "ESPDeer",    { Text="Deer ESP",   Callback=function(v) state.espDeer = v end })
+    AddControl(G, "ESPChild",   { Text="Child ESP",  Callback=function(v) state.espChild = v end })
+    AddControl(G, "ESPChest",   { Text="Chest ESP",  Callback=function(v) state.espChest = v end })
+    AddControl(G, "ESPBunny",   { Text="Bunny ESP",  Callback=function(v) state.espBunny = v end })
+end
+
+-- Items Tab
+do
+    local G = Tabs.Items:AddLeftGroupbox("Items")
+
+    AddControl(G, "BringFood", { Text="Bring Food", Default=false, Callback=function(v) state.bringFood = v end })
+    G:AddDropdown("FoodType", { Values={"Carrot","Berry"}, Default=1, Text="Food", Callback=function(v) state.selectedFood = v end })
+
+    AddControl(G, "BringCraftingBolt", {
+        Text="Bring All Bolts",
+        Default=false,
+        Callback=function(v)
+            state.bringCraftingBolt = v
+            if v then bringCraftingBolt() end
+        end
+    })
+end
+
+-- Player Tab
+do
+    local G = Tabs.Player:AddLeftGroupbox("Player")
+    G:AddButton("Teleport to Spawn",   function() if LocalPlayer.Character then LocalPlayer.Character:PivotTo(CFrame.new(11,4,1)) end end)
+    G:AddButton("Walk to Spawn",       function() if LocalPlayer.Character then LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(11,4,1)) end end)
+    AddControl(G, "InstantPP",     { Text="Instant PP", Callback=function(v) state.instantPP = v end })
+    AddControl(G, "ExpandBunny",   { Text="Expand Bunny Hitbox", Callback=function(v) state.expandBunny = v end })
+    AddControl(G, "FOVEnable",     { Text="FOV", Callback=function(v) state.fovEnabled = v end })
+    G:AddSlider("FOVSlider", { Text="FOV Value", Min=30, Max=120, Default=70, Callback=function(v) state.fovValue = v end })
+end
+
+-- Settings Tab
+do
+    local G = Tabs.Settings:AddLeftGroupbox("Settings")
+    G:AddButton("Toggle Checkbox Mode", function() state.useCheckboxes = not state.useCheckboxes end)
+    G:AddSlider("DPIScale", { Text="UI DPI", Min=100, Max=200, Default=100, Callback=function(v) Library:SetDPIScale(v) end })
+    G:AddButton("Unload UI", function() clearESP(); Library:Unload() end)
+end
+
+-- Main Loops
+-- ESP Loop
+task.spawn(function()
+    while task.wait(2) do
+        clearESP()
+        if state.espPlayers then
+            for _,p in ipairs(Players:GetPlayers()) do
+                if p~=LocalPlayer and p.Character then addESP(p.Character, p.DisplayName) end
+            end
+        end
+        if state.espDeer then local d=Workspace.Characters:FindFirstChild("Deer") if d then addESP(d,"Deer") end end
+        if state.espChild then for i=1,4 do local c=Workspace.Characters:FindFirstChild("Lost Child "..i) if c then addESP(c,"Child "..i) end end end
+        if state.espChest then for i=1,10 do local c=Workspace.Items:FindFirstChild("Item Chest"..(i==1 and "" or tostring(i))) if c then addESP(c,"Chest "..i) end end end
+        if state.espBunny then for _,b in ipairs(Workspace.Characters:GetChildren()) do if b.Name=="Bunny" and b:FindFirstChild("Humanoid") then addESP(b,"Bunny") end end end
+    end
+end)
+
+-- Feature Loop
+task.spawn(function()
+    while task.wait(0.1) do
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+        if state.fovEnabled then Camera.FieldOfView = state.fovValue else Camera.FieldOfView = 70 end
+        if state.instantPP then for _,p in ipairs(Workspace:GetDescendants()) do if p:IsA("ProximityPrompt") then p.HoldDuration=0 end end end
+
+        if state.autoKill and hrp then
+            local weapon = getWeapon()
+            if weapon then
+                for _,m in ipairs(Workspace.Characters:GetChildren()) do
+                    if m~=LocalPlayer.Character then
+                        local part = m:FindFirstChild("HumanoidRootPart")
+                        if part then
+                            local dir = (part.Position - Camera.CFrame.Position).Unit
+                            local dist = (Camera.CFrame.Position - part.Position).Magnitude
+                            if Camera.CFrame.LookVector:Dot(dir) > 0.5 and dist<=(state.killMode=="Legit" and 15 or 40) then
+                                Replicated.RemoteEvents.ToolDamageObject:InvokeServer(m,weapon,"19_7591937906",part.CFrame)
+                                break
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        if state.autoBreak and hrp then
+            local weapon = getWeapon()
+            local ray = Workspace:Raycast(Camera.CFrame.Position,Camera.CFrame.LookVector*15)
+            if ray and ray.Instance and ray.Instance.Name=="Trunk" then
+                Replicated.RemoteEvents.ToolDamageObject:InvokeServer(ray.Instance.Parent,weapon,"4_7591937906",CFrame.new(ray.Position))
+            end
+        end
+
+        if state.bringFood and hrp then
+            for _, item in ipairs(Workspace.Items:GetChildren()) do
+                if item.Name==state.selectedFood then
+                    local part = item:FindFirstChild("Hitbox") or item:FindFirstChild("Handle")
+                    if part then item:PivotTo(hrp.CFrame*CFrame.new(0,0,-3)) end
+                end
+            end
+        end
+
+        if state.bringCraftingBolt and hrp then
+            bringCraftingBolt()
+        end
+    end
+end)
