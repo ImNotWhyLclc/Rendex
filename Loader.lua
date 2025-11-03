@@ -1,7 +1,7 @@
 local base = "https://raw.githubusercontent.com/ImNotWhyLclc/Rendex/main/"
 local hm = {
     [606849621] = "games/jailbreak-break.luau",
-    [17516596118] = "games/hypershot.lua"
+    [127742093697776] = "Games/RendexPVB.lua" -- pvb
 }
 local file = hm[game.PlaceId]
 local so, tuff = pcall(function()
