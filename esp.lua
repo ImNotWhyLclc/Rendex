@@ -1,4 +1,6 @@
-if not game:IsLoaded() or not game.Loaded then game.Loaded:Wait() end
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
 
 local Camera = workspace.CurrentCamera
 local LocalPlayer = game:GetService("Players").LocalPlayer
@@ -932,5 +934,9 @@ for _, player in pairs(Services.Players:GetPlayers()) do
         MainESP:CreateESP(player)
     end
 end
+
+MainESP:CreateESP(nil, workspace.Drop, "Drop", function(obj)
+    return obj.Name == "Drop" and obj:IsA("Model")
+end)
 
 return MainESP, CullingSystem
