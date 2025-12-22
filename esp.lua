@@ -935,8 +935,14 @@ for _, player in pairs(Services.Players:GetPlayers()) do
     end
 end
 
-MainESP:CreateESP(nil, workspace.Drop, "Drop", function(obj)
-    return obj.Name == "Drop" and obj:IsA("Model")
+spawn(function()
+    repeat
+        task.wait(1)
+    until workspace:FindFirstChild("Drop")
+    
+    MainESP:CreateESP(nil, workspace.Drop, "Drop", function(obj)
+        return obj.Name == "Drop" and obj:IsA("Model")
+    end)
 end)
 
 return MainESP, CullingSystem
