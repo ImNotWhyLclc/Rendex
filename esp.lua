@@ -193,7 +193,7 @@ function CacheManager:CleanupCaches()
     end
     
     local colorKeysToRemove = {}
-    for key, data in pairs(MainESP._colorCache) do
+    for key, data in pairs(MainESP._positionCache) do
         if data.time and now - data.time > self.maxCacheAge then
             table.insert(colorKeysToRemove, key)
         end
@@ -846,6 +846,30 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
         end
     end
 end)
+
+-- Function to create ESP for workspace drops
+local function createDropESP()
+    for _, drop in pairs(workspace:GetChildren()) do
+        if drop.Name == "Drop" and not MainESP.Container[drop] then
+            MainESP:CreateESP(nil, drop, "Drop", function(obj) 
+                return obj.Name == "Drop" 
+            end)
+        end
+    end
+end
+
+-- Monitor for new drops
+workspace.ChildAdded:Connect(function(child)
+    if child.Name == "Drop" then
+        wait(0.1) -- Small delay to ensure object is fully loaded
+        MainESP:CreateESP(nil, child, "Drop", function(obj) 
+            return obj.Name == "Drop" 
+        end)
+    end
+end)
+
+-- Create ESP for existing drops
+createDropESP()
 
 local CompatibilityFuncs = {
     [292439477] = function()
