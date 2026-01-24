@@ -758,4 +758,6 @@ for _, p in pairs(Players:GetPlayers()) do
 	end
 end
 
+print("v0.0.2")
+
 return MainESP, CullingSystem
