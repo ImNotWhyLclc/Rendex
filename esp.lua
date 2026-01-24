@@ -747,7 +747,7 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
                     continue
                 end
                 
-                if MainESP.Options.Box and onScreen then
+                --[[ if MainESP.Options.Box and onScreen then
                     playerESP.Box.Size = Vector2.new(boxWidth, boxHeight)
                     playerESP.Box.Position = Vector2.new(boxX, boxY)
                     playerESP.Box.Color = color
@@ -755,7 +755,23 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
                     playerESP.Box.Visible = true
                 else
                     playerESP.Box.Visible = false
-                end
+                end ]]
+
+                if MainESP.Options.Box and onScreen then
+                local topScreen, topOnScreen = MainESP.WTVP(rootPart.Position + Vector3.new(0, characterSizeHalved, 0))
+    local bottomScreen, bottomOnScreen = MainESP.WTVP(rootPart.Position - Vector3.new(0, characterSizeHalved, 0))
+    
+    local boxHeight = topScreen.Y - bottomScreen.Y
+    local boxWidth = boxHeight * 0.6
+    
+    playerESP.Box.Size = Vector2.new(boxWidth, boxHeight)
+    playerESP.Box.Position = Vector2.new(rootPos.X - boxWidth/2, bottomScreen.Y)
+    playerESP.Box.Color = color
+    playerESP.Box.Thickness = MainESP.Options.BoxThickness
+    playerESP.Box.Visible = true
+else
+    playerESP.Box.Visible = false
+end
 
 				local dims = playerESP._BoxDimensions
                 
@@ -846,30 +862,6 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
         end
     end
 end)
-
--- Function to create ESP for workspace drops
-local function createDropESP()
-    for _, drop in pairs(workspace:GetChildren()) do
-        if drop.Name == "Drop" and not MainESP.Container[drop] then
-            MainESP:CreateESP(nil, drop, "Drop", function(obj) 
-                return obj.Name == "Drop" 
-            end)
-        end
-    end
-end
-
--- Monitor for new drops
-workspace.ChildAdded:Connect(function(child)
-    if child.Name == "Drop" then
-        wait(0.1) -- Small delay to ensure object is fully loaded
-        MainESP:CreateESP(nil, child, "Drop", function(obj) 
-            return obj.Name == "Drop" 
-        end)
-    end
-end)
-
--- Create ESP for existing drops
-createDropESP()
 
 local CompatibilityFuncs = {
     [292439477] = function()
