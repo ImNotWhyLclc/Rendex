@@ -757,21 +757,21 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
                     playerESP.Box.Visible = false
                 end ]]
 
-                if MainESP.Options.Box and onScreen then
+                if MainESP.Options.Box and onScreen then 
                 local topScreen, topOnScreen = MainESP.WTVP(rootPart.Position + Vector3.new(0, characterSizeHalved, 0))
-    local bottomScreen, bottomOnScreen = MainESP.WTVP(rootPart.Position - Vector3.new(0, characterSizeHalved, 0))
+                local bottomScreen, bottomOnScreen = MainESP.WTVP(rootPart.Position - Vector3.new(0, characterSizeHalved, 0))
     
-    local boxHeight = topScreen.Y - bottomScreen.Y
-    local boxWidth = boxHeight * 0.6
+                local boxHeight = topScreen.Y - bottomScreen.Y
+                local boxWidth = boxHeight * 0.6
     
-    playerESP.Box.Size = Vector2.new(boxWidth, boxHeight)
-    playerESP.Box.Position = Vector2.new(rootPos.X - boxWidth/2, bottomScreen.Y)
-    playerESP.Box.Color = color
-    playerESP.Box.Thickness = MainESP.Options.BoxThickness
-    playerESP.Box.Visible = true
-else
-    playerESP.Box.Visible = false
-end
+                    playerESP.Box.Size = Vector2.new(boxWidth, boxHeight)
+                    playerESP.Box.Position = Vector2.new(rootPos.X - boxWidth/2, bottomScreen.Y)
+                    playerESP.Box.Color = color
+                    playerESP.Box.Thickness = MainESP.Options.BoxThickness
+                    playerESP.Box.Visible = true
+                else
+                    playerESP.Box.Visible = false
+                end
 
 				local dims = playerESP._BoxDimensions
                 
@@ -950,5 +950,7 @@ for _, player in pairs(Services.Players:GetPlayers()) do
         MainESP:CreateESP(player)
     end
 end
+
+print("v0.0.1 esp")
 
 return MainESP, CullingSystem
