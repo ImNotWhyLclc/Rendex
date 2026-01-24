@@ -56,12 +56,15 @@ local MainESP = {
     _positionCache = {},
 }
 
-function MainESP.CreateBox()
+function MainESP.CreateBox(color)
     local box = Drawing.new("Square")
-    box.Thickness = 1
     box.Filled = false
+    box.Thickness = 1
+    box.Color = color or Color3.new(1, 1, 1)
+    box.Size = Vector2.new(0, 0)
+    box.Position = Vector2.new(0, 0)
     box.Visible = false
-    box.ZIndex = 1
+    box.ZIndex = 2
     return box
 end
 
@@ -478,7 +481,7 @@ function MainESP:CreateESP(player, object, customName, customPredicate)
     if player then
         local PlayerESP = {
             IsPlayer = true,
-            Box = self.CreateBox(),
+            Box = self.CreateBox(self.Options.Color),
             Health = self.CreateBox(),
             Tracer = self.CreateLine(),
             Name = self.CreateText(),
@@ -757,15 +760,15 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
                     playerESP.Box.Visible = false
                 end ]]
 
-                if MainESP.Options.Box and onScreen then 
-                local topScreen, topOnScreen = MainESP.WTVP(rootPart.Position + Vector3.new(0, characterSizeHalved, 0))
-                local bottomScreen, bottomOnScreen = MainESP.WTVP(rootPart.Position - Vector3.new(0, characterSizeHalved, 0))
-    
-                local boxHeight = topScreen.Y - bottomScreen.Y
+            if MainESP.Options.Box and onScreen then
+                local topPos, _ = MainESP.WTVP(rootPart.Position + Vector3.new(0, characterSizeHalved, 0))
+                local bottomPos, _ = MainESP.WTVP(rootPart.Position - Vector3.new(0, characterSizeHalved, 0))
+
+                local boxHeight = topPos.Y - bottomPos.Y
                 local boxWidth = boxHeight * 0.6
-    
+
                     playerESP.Box.Size = Vector2.new(boxWidth, boxHeight)
-                    playerESP.Box.Position = Vector2.new(rootPos.X - boxWidth/2, bottomScreen.Y)
+                    playerESP.Box.Position = Vector2.new(rootPos.X - boxWidth/2, bottomPos.Y)
                     playerESP.Box.Color = color
                     playerESP.Box.Thickness = MainESP.Options.BoxThickness
                     playerESP.Box.Visible = true
@@ -951,6 +954,6 @@ for _, player in pairs(Services.Players:GetPlayers()) do
     end
 end
 
-print("v0.0.1 esp")
+print("v0.0.1b esp")
 
 return MainESP, CullingSystem
