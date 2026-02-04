@@ -1,5 +1,7 @@
-if not game:IsLoaded() then
-    game.Loaded:Wait()
+if not game:IsLoaded() or not game.Loaded then game.Loaded:Wait() end
+getgenv().test = 35
+if game.PlaceId == 606849621 then
+    print("this is jailbreak")
 end
 
 local Camera = workspace.CurrentCamera
@@ -38,6 +40,7 @@ local MainESP = {
 		TracerThickness = 0,
 		DirectionThickness = 0,
 		SkeletonThickness = 0,
+        Bounties = false, -- jb only
 	},
 	ObjectOptions = {
 		Enabled = false,
@@ -52,10 +55,12 @@ local MainESP = {
 		TracerOrigin = "Bottom",
 		TracerThickness = 0,
 	},
+    -- Optimization caches
     _colorCache = {},
     _positionCache = {},
 }
 
+--[[ Drawing Creation Functions ]]--
 function MainESP.CreateBox()
     local box = Drawing.new("Square")
     box.Thickness = 1
@@ -95,6 +100,7 @@ function MainESP.CreateCircle()
     return circle
 end
 
+--[[ Utility Functions ]]--
 function MainESP.WTVP(position)
     return Camera:WorldToViewportPoint(position)
 end
@@ -119,6 +125,7 @@ function MainESP.GetDistanceFromPlayer(player, position)
     return math.huge
 end
 
+--[[ Color Management ]]--
 function MainESP:GetColor(player, useTeamColor, rainbow, defaultColor)
     local currentTime = tick()
     local cacheKey = player and tostring(player.UserId) or "default"
@@ -126,7 +133,9 @@ function MainESP:GetColor(player, useTeamColor, rainbow, defaultColor)
     if useTeamColor and player and player.Team then
         return player.Team.TeamColor.Color
     elseif rainbow then
+        -- Limit rainbow cache updates and add cleanup
         if not self._colorCache[cacheKey] or currentTime - (self._colorCache[cacheKey].time or 0) > 0.033 then
+            -- Only update rainbow color every ~30ms instead of every frame
             self._colorCache[cacheKey] = {
                 color = Color3.fromHSV(currentTime * 35 % 255/255, 1, 1),
                 time = currentTime
@@ -138,10 +147,11 @@ function MainESP:GetColor(player, useTeamColor, rainbow, defaultColor)
     end
 end
 
+--[[ Distance-Based Culling System ]]--
 local CullingSystem = {
-    maxRenderDistance = 2000,
-    nearDistance = 500,
-    farDistance = 1000,
+    maxRenderDistance = 2000, -- studs
+    nearDistance = 500, -- studs - full detail
+    farDistance = 1000, -- studs - reduced detail
 }
 
 function CullingSystem:ShouldRenderPlayer(player)
@@ -169,9 +179,10 @@ function CullingSystem:GetDetailLevel(distance)
     end
 end
 
+--[[ Position Caching ]]--
 local CacheManager = {
-    maxCacheAge = 30,
-    cleanupInterval = 10,
+    maxCacheAge = 30, -- seconds
+    cleanupInterval = 10, -- seconds
     lastCleanup = 0,
 }
 
@@ -181,6 +192,7 @@ function CacheManager:CleanupCaches()
         return
     end
     
+    -- Clean position cache
     local positionKeysToRemove = {}
     for key, data in pairs(MainESP._positionCache) do
         if now - data.time > self.maxCacheAge then
@@ -192,8 +204,9 @@ function CacheManager:CleanupCaches()
         MainESP._positionCache[key] = nil
     end
     
+    -- Clean color cache
     local colorKeysToRemove = {}
-    for key, data in pairs(MainESP._positionCache) do
+    for key, data in pairs(MainESP._colorCache) do
         if data.time and now - data.time > self.maxCacheAge then
             table.insert(colorKeysToRemove, key)
         end
@@ -204,10 +217,17 @@ function CacheManager:CleanupCaches()
     end
     
     self.lastCleanup = now
+    
+    -- Debug info (remove in production)
+    -- if #positionKeysToRemove > 0 or #colorKeysToRemove > 0 then
+    --     print(string.format("Cache cleanup: Removed %d position entries, %d color entries", 
+    --         #positionKeysToRemove, #colorKeysToRemove))
+    -- end
 end
 
 function MainESP:GetCachedPosition(part, partName, player, forceUpdate)
     local currentTime = tick()
+    -- Include player userid in cache key to separate per player
     local playerKey = player and tostring(player.UserId) or "unknown"
     local cacheKey = playerKey .. "_" .. tostring(part) .. "_" .. partName
     
@@ -226,8 +246,10 @@ function MainESP:GetCachedPosition(part, partName, player, forceUpdate)
     return pos, onScreen
 end
 
+--[[ Skeleton System ]]--
 function MainESP:CreateSkeleton()
     local skeleton = {
+        -- R15 and R6 compatible skeleton lines
         HeadToNeck = self.CreateLine(),
         NeckToRightUpperArm = self.CreateLine(),
         NeckToLeftUpperArm = self.CreateLine(),
@@ -248,6 +270,7 @@ end
 
 function MainESP:UpdateSkeleton(playerESP, player, onScreen)
     if not self.Options.Skeleton or not onScreen or not player.Character then
+        -- Hide all skeleton lines
         for _, line in pairs(playerESP.Skeleton) do
             if line and line.Visible ~= nil then
                 line.Visible = false
@@ -259,6 +282,7 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
     local character = player.Character
     local head = character:FindFirstChild("Head")
     if not head then
+        -- Hide all skeleton lines if no head
         for _, line in pairs(playerESP.Skeleton) do
             if line and line.Visible ~= nil then
                 line.Visible = false
@@ -268,9 +292,11 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
     end
     
     local color = self:GetColor(player, self.Options.UseTeamColor, self.Options.Rainbow, self.Options.Color)
-    local headPos, _ = MainESP:GetCachedPosition(head, "Head", player)
+    local headPos = MainESP:GetCachedPosition(head, "Head", player)
     
+    -- Check if R15 or R6
     if character:FindFirstChild("UpperTorso") then
+        -- R15 Character
         local upperTorso = character:FindFirstChild("UpperTorso")
         local lowerTorso = character:FindFirstChild("LowerTorso")
         local rightUpperArm = character:FindFirstChild("RightUpperArm")
@@ -288,27 +314,30 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
            leftUpperArm and leftLowerArm and rightUpperLeg and rightLowerLeg and 
            rightFoot and leftUpperLeg and leftLowerLeg and leftFoot then
             
-            local upperTorsoPos, _ = MainESP:GetCachedPosition(upperTorso, "UpperTorso", player)
-            local lowerTorsoPos, _ = MainESP:GetCachedPosition(lowerTorso, "LowerTorso", player)
-            local rightUpperArmPos, _ = MainESP:GetCachedPosition(rightUpperArm, "RightUpperArm", player)
-            local rightLowerArmPos, _ = MainESP:GetCachedPosition(rightLowerArm, "RightLowerArm", player)
-            local leftUpperArmPos, _ = MainESP:GetCachedPosition(leftUpperArm, "LeftUpperArm", player)
-            local leftLowerArmPos, _ = MainESP:GetCachedPosition(leftLowerArm, "LeftLowerArm", player)
-            local rightUpperLegPos, _ = MainESP:GetCachedPosition(rightUpperLeg, "RightUpperLeg", player)
-            local rightLowerLegPos, _ = MainESP:GetCachedPosition(rightLowerLeg, "RightLowerLeg", player)
-            local rightFootPos, _ = MainESP:GetCachedPosition(rightFoot, "RightFoot", player)
-            local leftUpperLegPos, _ = MainESP:GetCachedPosition(leftUpperLeg, "LeftUpperLeg", player)
-            local leftLowerLegPos, _ = MainESP:GetCachedPosition(leftLowerLeg, "LeftLowerLeg", player)
-            local leftFootPos, _ = MainESP:GetCachedPosition(leftFoot, "LeftFoot", player)
+            local upperTorsoPos = MainESP:GetCachedPosition(upperTorso, "UpperTorso", player)
+            local lowerTorsoPos = MainESP:GetCachedPosition(lowerTorso, "LowerTorso", player)
+            local rightUpperArmPos = MainESP:GetCachedPosition(rightUpperArm, "RightUpperArm", player)
+            local rightLowerArmPos = MainESP:GetCachedPosition(rightLowerArm, "RightLowerArm", player)
+            local leftUpperArmPos = MainESP:GetCachedPosition(leftUpperArm, "LeftUpperArm", player)
+            local leftLowerArmPos = MainESP:GetCachedPosition(leftLowerArm, "LeftLowerArm", player)
+            local rightUpperLegPos = MainESP:GetCachedPosition(rightUpperLeg, "RightUpperLeg", player)
+            local rightLowerLegPos = MainESP:GetCachedPosition(rightLowerLeg, "RightLowerLeg", player)
+            local rightFootPos = MainESP:GetCachedPosition(rightFoot, "RightFoot", player)
+            local leftUpperLegPos = MainESP:GetCachedPosition(leftUpperLeg, "LeftUpperLeg", player)
+            local leftLowerLegPos = MainESP:GetCachedPosition(leftLowerLeg, "LeftLowerLeg", player)
+            local leftFootPos = MainESP:GetCachedPosition(leftFoot, "LeftFoot", player)
             
+            -- Calculate neck position (between head and upper torso)
             local neckPos = Vector2.new(upperTorsoPos.X, (headPos.Y + upperTorsoPos.Y) / 2)
             
+            -- Head to Neck
             playerESP.Skeleton.HeadToNeck.From = Vector2.new(headPos.X, headPos.Y)
             playerESP.Skeleton.HeadToNeck.To = neckPos
             playerESP.Skeleton.HeadToNeck.Color = color
             playerESP.Skeleton.HeadToNeck.Thickness = self.Options.SkeletonThickness
             playerESP.Skeleton.HeadToNeck.Visible = true
             
+            -- Neck to Arms
             playerESP.Skeleton.NeckToRightUpperArm.From = neckPos
             playerESP.Skeleton.NeckToRightUpperArm.To = Vector2.new(rightUpperArmPos.X, rightUpperArmPos.Y)
             playerESP.Skeleton.NeckToRightUpperArm.Color = color
@@ -321,6 +350,7 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
             playerESP.Skeleton.NeckToLeftUpperArm.Thickness = self.Options.SkeletonThickness
             playerESP.Skeleton.NeckToLeftUpperArm.Visible = true
             
+            -- Upper to Lower Arms
             playerESP.Skeleton.RightUpperArmToRightLowerArm.From = Vector2.new(rightUpperArmPos.X, rightUpperArmPos.Y)
             playerESP.Skeleton.RightUpperArmToRightLowerArm.To = Vector2.new(rightLowerArmPos.X, rightLowerArmPos.Y)
             playerESP.Skeleton.RightUpperArmToRightLowerArm.Color = color
@@ -333,12 +363,14 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
             playerESP.Skeleton.LeftUpperArmToLeftLowerArm.Thickness = self.Options.SkeletonThickness
             playerESP.Skeleton.LeftUpperArmToLeftLowerArm.Visible = true
             
+            -- Neck to Lower Torso
             playerESP.Skeleton.NeckToLowerTorso.From = neckPos
             playerESP.Skeleton.NeckToLowerTorso.To = Vector2.new(lowerTorsoPos.X, lowerTorsoPos.Y)
             playerESP.Skeleton.NeckToLowerTorso.Color = color
             playerESP.Skeleton.NeckToLowerTorso.Thickness = self.Options.SkeletonThickness
             playerESP.Skeleton.NeckToLowerTorso.Visible = true
             
+            -- Lower Torso to Legs
             playerESP.Skeleton.LowerTorsoToRightUpperLeg.From = Vector2.new(lowerTorsoPos.X, lowerTorsoPos.Y)
             playerESP.Skeleton.LowerTorsoToRightUpperLeg.To = Vector2.new(rightUpperLegPos.X, rightUpperLegPos.Y)
             playerESP.Skeleton.LowerTorsoToRightUpperLeg.Color = color
@@ -351,6 +383,7 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
             playerESP.Skeleton.LowerTorsoToLeftUpperLeg.Thickness = self.Options.SkeletonThickness
             playerESP.Skeleton.LowerTorsoToLeftUpperLeg.Visible = true
             
+            -- Upper to Lower Legs
             playerESP.Skeleton.RightUpperLegToRightLowerLeg.From = Vector2.new(rightUpperLegPos.X, rightUpperLegPos.Y)
             playerESP.Skeleton.RightUpperLegToRightLowerLeg.To = Vector2.new(rightLowerLegPos.X, rightLowerLegPos.Y)
             playerESP.Skeleton.RightUpperLegToRightLowerLeg.Color = color
@@ -363,6 +396,7 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
             playerESP.Skeleton.LeftUpperLegToLeftLowerLeg.Thickness = self.Options.SkeletonThickness
             playerESP.Skeleton.LeftUpperLegToLeftLowerLeg.Visible = true
             
+            -- Lower Legs to Feet
             playerESP.Skeleton.RightLowerLegToRightFoot.From = Vector2.new(rightLowerLegPos.X, rightLowerLegPos.Y)
             playerESP.Skeleton.RightLowerLegToRightFoot.To = Vector2.new(rightFootPos.X, rightFootPos.Y)
             playerESP.Skeleton.RightLowerLegToRightFoot.Color = color
@@ -375,11 +409,12 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
             playerESP.Skeleton.LeftLowerLegToLeftFoot.Thickness = self.Options.SkeletonThickness
             playerESP.Skeleton.LeftLowerLegToLeftFoot.Visible = true
             
+            -- Handle hands if they exist
             if character:FindFirstChild("RightHand") and character:FindFirstChild("LeftHand") then
                 local rightHand = character.RightHand
                 local leftHand = character.LeftHand
-                local rightHandPos, _ = MainESP:GetCachedPosition(rightHand, "RightHand", player)
-                local leftHandPos, _ = MainESP:GetCachedPosition(leftHand, "LeftHand", player)
+                local rightHandPos = MainESP:GetCachedPosition(rightHand, "RightHand", player)
+                local leftHandPos = MainESP:GetCachedPosition(leftHand, "LeftHand", player)
                 
                 playerESP.Skeleton.RightLowerArmToRightHand.From = Vector2.new(rightLowerArmPos.X, rightLowerArmPos.Y)
                 playerESP.Skeleton.RightLowerArmToRightHand.To = Vector2.new(rightHandPos.X, rightHandPos.Y)
@@ -393,10 +428,12 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
                 playerESP.Skeleton.LeftLowerArmToLeftHand.Thickness = self.Options.SkeletonThickness
                 playerESP.Skeleton.LeftLowerArmToLeftHand.Visible = true
             else
+                -- Hide hand connections if hands don't exist
                 playerESP.Skeleton.RightLowerArmToRightHand.Visible = false
                 playerESP.Skeleton.LeftLowerArmToLeftHand.Visible = false
             end
         else
+            -- Hide all if missing parts
             for _, line in pairs(playerESP.Skeleton) do
                 if line and line.Visible ~= nil then
                     line.Visible = false
@@ -405,6 +442,7 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
         end
         
     else
+        -- R6 Character
         local torso = character:FindFirstChild("Torso")
         local rightArm = character:FindFirstChild("Right Arm")
         local leftArm = character:FindFirstChild("Left Arm")
@@ -412,20 +450,23 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
         local leftLeg = character:FindFirstChild("Left Leg")
         
         if torso and rightArm and leftArm and rightLeg and leftLeg then
-            local rootPos, _ = MainESP:GetCachedPosition(torso, "Torso", player)
-            local rightArmPos, _ = MainESP:GetCachedPosition(rightArm, "RightArm", player)
-            local leftArmPos, _ = MainESP:GetCachedPosition(leftArm, "LeftArm", player)
-            local rightLegPos, _ = MainESP:GetCachedPosition(rightLeg, "RightLeg", player)
-            local leftLegPos, _ = MainESP:GetCachedPosition(leftLeg, "LeftLeg", player)
+            local rootPos = MainESP:GetCachedPosition(torso, "Torso", player)
+            local rightArmPos = MainESP:GetCachedPosition(rightArm, "RightArm", player)
+            local leftArmPos = MainESP:GetCachedPosition(leftArm, "LeftArm", player)
+            local rightLegPos = MainESP:GetCachedPosition(rightLeg, "RightLeg", player)
+            local leftLegPos = MainESP:GetCachedPosition(leftLeg, "LeftLeg", player)
             
+            -- Calculate neck position (between head and torso)
             local neckPos = Vector2.new(rootPos.X, (headPos.Y + rootPos.Y) / 2)
             
+            -- Head to Neck
             playerESP.Skeleton.HeadToNeck.From = Vector2.new(headPos.X, headPos.Y)
             playerESP.Skeleton.HeadToNeck.To = neckPos
             playerESP.Skeleton.HeadToNeck.Color = color
             playerESP.Skeleton.HeadToNeck.Thickness = self.Options.SkeletonThickness
             playerESP.Skeleton.HeadToNeck.Visible = true
             
+            -- Neck to Arms
             playerESP.Skeleton.NeckToRightUpperArm.From = neckPos
             playerESP.Skeleton.NeckToRightUpperArm.To = Vector2.new(rightArmPos.X, rightArmPos.Y)
             playerESP.Skeleton.NeckToRightUpperArm.Color = color
@@ -438,12 +479,14 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
             playerESP.Skeleton.NeckToLeftUpperArm.Thickness = self.Options.SkeletonThickness
             playerESP.Skeleton.NeckToLeftUpperArm.Visible = true
             
+            -- Neck to Torso
             playerESP.Skeleton.NeckToLowerTorso.From = neckPos
             playerESP.Skeleton.NeckToLowerTorso.To = Vector2.new(rootPos.X, rootPos.Y)
             playerESP.Skeleton.NeckToLowerTorso.Color = color
             playerESP.Skeleton.NeckToLowerTorso.Thickness = self.Options.SkeletonThickness
             playerESP.Skeleton.NeckToLowerTorso.Visible = true
             
+            -- Torso to Legs
             playerESP.Skeleton.LowerTorsoToRightUpperLeg.From = Vector2.new(rootPos.X, rootPos.Y)
             playerESP.Skeleton.LowerTorsoToRightUpperLeg.To = Vector2.new(rightLegPos.X, rightLegPos.Y)
             playerESP.Skeleton.LowerTorsoToRightUpperLeg.Color = color
@@ -456,6 +499,7 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
             playerESP.Skeleton.LowerTorsoToLeftUpperLeg.Thickness = self.Options.SkeletonThickness
             playerESP.Skeleton.LowerTorsoToLeftUpperLeg.Visible = true
             
+            -- Hide R15-specific connections for R6
             playerESP.Skeleton.RightUpperArmToRightLowerArm.Visible = false
             playerESP.Skeleton.LeftUpperArmToLeftLowerArm.Visible = false
             playerESP.Skeleton.RightLowerArmToRightHand.Visible = false
@@ -465,6 +509,7 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
             playerESP.Skeleton.RightLowerLegToRightFoot.Visible = false
             playerESP.Skeleton.LeftLowerLegToLeftFoot.Visible = false
         else
+            -- Hide all if missing parts
             for _, line in pairs(playerESP.Skeleton) do
                 if line and line.Visible ~= nil then
                     line.Visible = false
@@ -474,6 +519,7 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
     end
 end
 
+--[[ Main ESP Creation ]]--
 function MainESP:CreateESP(player, object, customName, customPredicate)
     if player then
         local PlayerESP = {
@@ -488,6 +534,10 @@ function MainESP:CreateESP(player, object, customName, customPredicate)
             Connections = {},
 			_BoxDimensions = { width = 0, height = 0, x = 0, y = 0 },
         }
+
+        if game.PlaceId == 606849621 then
+            PlayerESP.Bounties = self.CreateText()
+        end
         
         self.Container[player] = PlayerESP
         
@@ -518,6 +568,7 @@ function MainESP:CreateESP(player, object, customName, customPredicate)
                 local rootPos, onScreen = self.WTVP(object.Position)
                 local color = self:GetColor(nil, false, self.ObjectOptions.Rainbow, self.ObjectOptions.Color)
                 
+                -- Object Tracer
                 if self.ObjectOptions.Tracer and rootPos.Z > 0 then
                     ObjectESP.Tracer.From = self.TracerOrigins[self.ObjectOptions.TracerOrigin]
                     ObjectESP.Tracer.To = Vector2.new(rootPos.X, rootPos.Y)
@@ -528,6 +579,7 @@ function MainESP:CreateESP(player, object, customName, customPredicate)
                     ObjectESP.Tracer.Visible = false
                 end
                 
+                -- Object Info
                 if onScreen and (self.ObjectOptions.Name or self.ObjectOptions.Distance) then
                     local name = self.ObjectOptions.Name and (customName or object.Name) or ""
                     local distance = ""
@@ -572,21 +624,23 @@ function MainESP:RemoveESP(value)
     local container = self.Container[value]
     if not container then return end
     
-    local playerName = (typeof(value) == "Instance" and value:IsA("Player")) and value.Name or tostring(value)
-    local userId = (typeof(value) == "Instance" and value:IsA("Player")) and value.UserId or nil
+    -- Clear caches more efficiently
+    local playerName = type(value) == "userdata" and value.Name or tostring(value)
     
+    -- Remove all cache entries for this player
     for key in pairs(self._colorCache) do
-        if (userId and key:find(tostring(userId))) or key:find(playerName) then
+        if key:find(playerName) then
             self._colorCache[key] = nil
         end
     end
     
     for key in pairs(self._positionCache) do
-        if (userId and key:find(tostring(userId))) or key:find(playerName) then
+        if key:find(playerName) then
             self._positionCache[key] = nil
         end
     end
     
+    -- Disconnect connections (only for objects)
     if container.Connections then
         for _, connection in pairs(container.Connections) do
             if connection and connection.Connected then
@@ -596,14 +650,15 @@ function MainESP:RemoveESP(value)
         container.Connections = nil
     end
     
+    -- Remove drawing objects safely
     for elementName, element in pairs(container) do
-        if typeof(element) == "table" then
-            for _, sub in pairs(element) do
-                pcall(function() sub:Remove() end)
-            end
-        else
-            pcall(function() element:Remove() end)
-        end
+		pcall(function()
+			for _, line in pairs(element) do
+				pcall(function() line:Destroy() end)
+			end
+		end)
+
+		pcall(function() element:Destroy() end)
     end
     
     self.Container[value] = nil
@@ -611,29 +666,41 @@ end
 
 local ESPPerformance = {
     lastUpdate = 0,
-    interval = 1/45,
+    interval = 1/45, -- Start with reasonable update rate (45 FPS)
+    
+    -- FPS averaging system
     fpsHistory = {},
-    fpsHistorySize = 60,
+    fpsHistorySize = 60, -- Average over 60 frames
     fpsSum = 0,
     averageFPS = 60,
     lastOptimize = 0,
-    targetFPS = 55,
-    minInterval = 1/30,
-    maxInterval = 1/120,
-    adjustmentRate = 0.1,
-    stabilityThreshold = 10,
+    
+    -- Performance thresholds
+    targetFPS = 55, -- Target to maintain above this FPS
+    minInterval = 1/30,  -- Min ESP update rate (30 FPS)
+    maxInterval = 1/120, -- Max ESP update rate (120 FPS)
+    
+    -- Smoothing factors
+    adjustmentRate = 0.1, -- How aggressively to adjust (0.1 = 10% per adjustment)
+    stabilityThreshold = 10, -- FPS must change by this amount to trigger adjustment
 }
 
 local function updateFPSAverage()
     local currentFPS = math.min(1 / Services.Stats.FrameTime, 200)
     
+    -- Add new FPS to history
     table.insert(ESPPerformance.fpsHistory, currentFPS)
     ESPPerformance.fpsSum = ESPPerformance.fpsSum + currentFPS
     
-    while #ESPPerformance.fpsHistory > ESPPerformance.fpsHistorySize do
-        ESPPerformance.fpsSum = ESPPerformance.fpsSum - table.remove(ESPPerformance.fpsHistory, 1)
-    end
+    -- Remove old FPS if history is too large (FIXED: Better cleanup)
+    if #ESPPerformance.fpsHistory > ESPPerformance.fpsHistorySize then
+		local overflow = #ESPPerformance.fpsHistory - ESPPerformance.fpsHistorySize
+		for _ = 1, overflow do
+			ESPPerformance.fpsSum -= table.remove(ESPPerformance.fpsHistory, 1)
+		end
+	end
     
+    -- Calculate average (prevent division by zero)
     if #ESPPerformance.fpsHistory > 0 then
         ESPPerformance.averageFPS = ESPPerformance.fpsSum / #ESPPerformance.fpsHistory
     end
@@ -642,44 +709,66 @@ end
 local globalRenderConnection = Services.RunService.RenderStepped:Connect(function()
     local now = tick()
     
+    -- Update FPS average every frame
     updateFPSAverage()
 
+	-- Cleanup caches periodically
 	CacheManager:CleanupCaches()
     
+    -- Optimize every 0.5 seconds for stability
     if now - ESPPerformance.lastOptimize >= 0.5 then
         local currentAvgFPS = ESPPerformance.averageFPS
         
+        -- Only adjust if we have enough history for reliable average
         if #ESPPerformance.fpsHistory >= math.min(10, ESPPerformance.fpsHistorySize) then
             if currentAvgFPS < ESPPerformance.targetFPS - ESPPerformance.stabilityThreshold then
-                ESPPerformance.interval = math.min(ESPPerformance.interval * (1 + ESPPerformance.adjustmentRate), ESPPerformance.minInterval)
+				-- print("reducing interval")
+                -- FPS too low, reduce ESP update rate
+                local adjustment = 1 + ESPPerformance.adjustmentRate
+                ESPPerformance.interval = math.min(ESPPerformance.interval * adjustment, ESPPerformance.minInterval)
             elseif currentAvgFPS > ESPPerformance.targetFPS + ESPPerformance.stabilityThreshold then
-                ESPPerformance.interval = math.max(ESPPerformance.interval * (1 - ESPPerformance.adjustmentRate), ESPPerformance.maxInterval)
+				-- print("increasing interval")
+                -- FPS good, can increase ESP update rate
+                local adjustment = 1 - ESPPerformance.adjustmentRate
+                ESPPerformance.interval = math.max(ESPPerformance.interval * adjustment, ESPPerformance.maxInterval)
             end
+            -- If FPS is within threshold, don't adjust (stability)
         end
         
         ESPPerformance.lastOptimize = now
+        
+        -- Debug output (remove in production)
+        -- print(string.format("ESP: Avg FPS: %.1f, Interval: %.3f, Update Rate: %.1f", 
+        --     currentAvgFPS, ESPPerformance.interval, 1/ESPPerformance.interval))
     end
     
+    -- Frame limiting with smooth intervals
     if now - ESPPerformance.lastUpdate < ESPPerformance.interval then
         return 
     end
     ESPPerformance.lastUpdate = now
     
+    -- Update all players
     for player, playerESP in pairs(MainESP.Container) do
         if playerESP.IsPlayer then
+			-- Skip if player is invalid or destroyed
             if not player or not player.Parent then
+                -- Clean up invalid player
                 MainESP:RemoveESP(player)
                 continue
             end
 
+			-- Distance-based culling
             local shouldRender, distance = CullingSystem:ShouldRenderPlayer(player)
             if not shouldRender then
                 MainESP:HidePlayerESP(playerESP)
                 continue
             end
             
+            -- Get detail level for distance-based optimization
             local detailLevel = CullingSystem:GetDetailLevel(distance)
 
+            -- Move the entire player update logic here
             if MainESP.Options.Enabled and 
                (not MainESP.Options.TeamCheck or not player.Team or LocalPlayer.Team ~= player.Team) and 
                MainESP:PlayerAlive(player) and player.Character then
@@ -687,8 +776,7 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
                 local character = player.Character
                 local rootPart = character:FindFirstChild("UpperTorso") or character:FindFirstChild("Torso")
                 local head = character:FindFirstChild("Head")
-                local _, characterSizeHalved = character:GetBoundingBox()
-                characterSizeHalved = characterSizeHalved.Y / 2
+                local characterSizeHalved = select(2, character:GetBoundingBox()) / 2
                 
                 if not rootPart or not head then
                     MainESP:HidePlayerESP(playerESP)
@@ -696,9 +784,9 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
                 end
                 
                 local rootPos, onScreen = MainESP:GetCachedPosition(rootPart, "RootPart", player, true)
-				local headPos, _ = MainESP:GetCachedPosition(head, "Head", player)
-                local topPos = MainESP.WTVP(rootPart.Position + Vector3.new(0, characterSizeHalved, 0))
-                local bottomPos = MainESP.WTVP(rootPart.Position - Vector3.new(0, characterSizeHalved, 0))
+				local headPos = MainESP:GetCachedPosition(head, "Head", player)
+                local topPos = MainESP.WTVP(rootPart.Position + Vector3.new(0, characterSizeHalved.Y, 0))
+                local bottomPos = MainESP.WTVP(rootPart.Position - Vector3.new(0, characterSizeHalved.Y, 0))
                 
                 local color = MainESP:GetColor(player, MainESP.Options.UseTeamColor, MainESP.Options.Rainbow, MainESP.Options.Color)
 
@@ -715,14 +803,18 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
                 local dims = playerESP._BoxDimensions
                 local infoX
 
+				-- Skip expensive operations for far players
                 if detailLevel == "minimal" then
+                    -- Name/Distance ESP
                     if MainESP.Options.Name and onScreen then
                         local dynamicOffsetY = dims.height * 1.1
-                        infoX = infoX or (dims.x + dims.width / 2)
+                        if not infoX then
+                            infoX = dims.x + dims.width / 2
+                        end
 
                         playerESP.Name.Text = player.DisplayName
                         if MainESP.Options.Distance and onScreen then
-                            playerESP.Name.Text = playerESP.Name.Text .. "\n" .. "[" .. tostring(math.round(distance)) .. " studs]"
+                            playerESP.Name.Text ..= "\n" .. "[" .. tostring(math.round(distance)) .. " studs]"
                         end
 
                         playerESP.Name.Position = Vector2.new(infoX, topPos.Y - 25)
@@ -736,6 +828,7 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
                         playerESP.Name.Visible = false
                     end
                     
+                    -- Hide other elements
                     playerESP.Box.Visible = false
                     playerESP.Health.Visible = false
                     playerESP.Distance.Visible = false
@@ -747,6 +840,7 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
                     continue
                 end
                 
+                -- Box ESP (full/medium detail)
                 if MainESP.Options.Box and onScreen then
                     playerESP.Box.Size = Vector2.new(boxWidth, boxHeight)
                     playerESP.Box.Position = Vector2.new(boxX, boxY)
@@ -759,17 +853,17 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
 
 				local dims = playerESP._BoxDimensions
                 
-                if MainESP.Options.Health and onScreen and playerESP.Box.Visible and detailLevel == "full" then
+                -- Health ESP (full detail)
+				if MainESP.Options.Health and onScreen and playerESP.Box.Visible and detailLevel == "full" then
 					local health, maxHealth = MainESP.GetHealth(player)
 					local healthPerc = health / maxHealth
 
 					local healthWidth = dims.width * 0.15
 					local healthHeight = dims.height * healthPerc
 					local offsetX = dims.width * 0.150
-                    local healthY = dims.y + dims.height - healthHeight
 
 					playerESP.Health.Size = Vector2.new(healthWidth, healthHeight)
-					playerESP.Health.Position = Vector2.new(dims.x - offsetX, healthY)
+					playerESP.Health.Position = Vector2.new(dims.x - offsetX, dims.y)
 					playerESP.Health.Color = Color3.fromHSV(healthPerc * 0.3, 1, 1)
 					playerESP.Health.Filled = true
 					playerESP.Health.Visible = true
@@ -777,11 +871,11 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
 					playerESP.Health.Visible = false
 				end
                 
+                -- Tracer ESP (full detail)
                 if MainESP.Options.Tracer and rootPos.Z > 0 and detailLevel == "full" then
-                    local neckPos
-                    local upperTorso = character:FindFirstChild("UpperTorso")
+                    local upperTorso, neckPos = character:FindFirstChild("UpperTorso")
                     if upperTorso then
-                        local upperTorsoPos, _ = MainESP:GetCachedPosition(upperTorso, "UpperTorso", player)
+                        local upperTorsoPos = MainESP:GetCachedPosition(upperTorso, "UpperTorso", player)
                         neckPos = Vector2.new(upperTorsoPos.X, (headPos.Y + upperTorsoPos.Y) / 2)
                     else
                         neckPos = Vector2.new(rootPos.X, (headPos.Y + rootPos.Y) / 2)
@@ -796,8 +890,11 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
                     playerESP.Tracer.Visible = false
                 end
                 
+                -- Name ESP (full/medium detail)
                 if MainESP.Options.Name and onScreen then
-                    infoX = infoX or (dims.x + dims.width / 2)
+                    if not infoX then
+                        infoX = dims.x + dims.width / 2
+                    end
                     
                     playerESP.Name.Text = player.DisplayName
                     playerESP.Name.Position = Vector2.new(infoX, topPos.Y - 25)
@@ -810,13 +907,56 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
                 else
                     playerESP.Name.Visible = false
                 end
+
+                -- jb bounties system (WARNING: poorly wrtitten)
+                if MainESP.Options.Bounties and onScreen and game.PlaceId == 606849621 then
+                    if not infoX then
+                        infoX = dims.x + dims.width / 2
+                    end
+
+                    local getUsernameFromDisplayName = (function(name)
+                        for i,v in next, game:GetService("Players"):GetPlayers() do
+                            if v.DisplayName == name then
+                                return v.Name
+                            end
+                        end
+                        return nil
+                    end)
+
+                    local format = (function(displayname)
+                        local uh = getUsernameFromDisplayName(displayname)
+                        if uh then
+                            local module = require(game:GetService("ReplicatedStorage").Bounty.BountyBoardService)
+                            for i,v in next, module.Bounties do
+                                if v.Name == uh then
+                                    return "Bounty: ".. tostring(v.Bounty)
+                                end
+                            end
+                        end
+                        return ""
+                    end)
+                    
+                    playerESP.Bounties.Text = format(player.DisplayName)
+                    playerESP.Bounties.Position = Vector2.new(infoX, topPos.Y - getgenv().test)
+                    playerESP.Bounties.Color = Color3.fromRGB(255, 255, 0)
+                    playerESP.Bounties.Font = MainESP.Options.Font
+                    playerESP.Bounties.Size = MainESP.Options.FontSize
+                    playerESP.Bounties.Outline = MainESP.Options.TextOutline
+                    playerESP.Bounties.OutlineColor = Color3.fromRGB(0, 0, 0)
+                    playerESP.Bounties.Visible = true
+                else
+                    playerESP.Bounties.Visible = false
+                end
                 
+                -- Distance ESP (full/medium detail)
 				if MainESP.Options.Distance and onScreen then
 					local dynamicOffsetY = dims.height * 0.1
-                    infoX = infoX or (dims.x + dims.width / 2)
+                    if not infoX then
+                        infoX = dims.x + dims.width / 2
+                    end
 
 					playerESP.Distance.Text = "[" .. tostring(math.round(distance)) .. " studs]"
-					playerESP.Distance.Position = Vector2.new(infoX, dims.y + dims.height - dynamicOffsetY)
+					playerESP.Distance.Position = Vector2.new(infoX, dims.y - dynamicOffsetY)
 					playerESP.Distance.Color = color
 					playerESP.Distance.Font = MainESP.Options.Font
 					playerESP.Distance.Size = MainESP.Options.FontSize
@@ -827,8 +967,9 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
 					playerESP.Distance.Visible = false
 				end
                 
+                -- Direction ESP (full detail)
                 if MainESP.Options.Direction and onScreen and detailLevel == "full" then
-                    local offset = MainESP.WTVP((head.CFrame * CFrame.new(0, 0, -head.Size.Z / 2)).Position)
+                    local offset = MainESP.WTVP((head.CFrame * CFrame.new(0, 0, -head.Size.Z)).Position)
                     playerESP.Direction.From = Vector2.new(headPos.X, headPos.Y)
                     playerESP.Direction.To = Vector2.new(offset.X, offset.Y)
                     playerESP.Direction.Color = color
@@ -838,6 +979,7 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
                     playerESP.Direction.Visible = false
                 end
                 
+                -- Skeleton ESP (full detail)
                 MainESP:UpdateSkeleton(playerESP, player, onScreen and detailLevel == "full")
                 
             else
@@ -847,32 +989,9 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
     end
 end)
 
--- Function to create ESP for workspace drops
-local function createDropESP()
-    for _, drop in pairs(workspace:GetChildren()) do
-        if drop.Name == "Drop" and not MainESP.Container[drop] then
-            MainESP:CreateESP(nil, drop, "Drop", function(obj) 
-                return obj.Name == "Drop" 
-            end)
-        end
-    end
-end
-
--- Monitor for new drops
-workspace.ChildAdded:Connect(function(child)
-    if child.Name == "Drop" then
-        wait(0.1) -- Small delay to ensure object is fully loaded
-        MainESP:CreateESP(nil, child, "Drop", function(obj) 
-            return obj.Name == "Drop" 
-        end)
-    end
-end)
-
--- Create ESP for existing drops
-createDropESP()
-
+--[[ Game Compatibility ]]--
 local CompatibilityFuncs = {
-    [292439477] = function()
+    [292439477] = function() -- Phantom Forces
         for _, v in pairs(getgc(true)) do
             if type(v) == "function" and islclosure(v) then
                 local constants = getconstants(v)
@@ -898,13 +1017,13 @@ local CompatibilityFuncs = {
         end)
     end,
     
-    [286090429] = function()
+    [286090429] = function() -- Arsenal
         MainESP.GetHealth = function(player)
             return player.NRPBS.Health.Value, 100
         end
     end,
     
-    [142823291] = function()
+    [142823291] = function() -- Murder Mystery 2
         local murderTeam = Instance.new("Team")
         murderTeam.Name = "Murderer"
         murderTeam.TeamColor = BrickColor.new("Bright red")
@@ -941,16 +1060,18 @@ local CompatibilityFuncs = {
     end,
 }
 
+-- Apply game-specific compatibility
 if CompatibilityFuncs[game.PlaceId] then
     CompatibilityFuncs[game.PlaceId]()
 end
 
+--[[ Player Management ]]--
 Services.Players.PlayerAdded:Connect(function(player)
     MainESP:CreateESP(player)
 end)
 
 Services.Players.PlayerRemoving:Connect(function(player)
-    MainESP:RemoveESP(player)
+    MainESP:RemoveESP(player.Name)
 end)
 
 for _, player in pairs(Services.Players:GetPlayers()) do
