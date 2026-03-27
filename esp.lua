@@ -1,5 +1,8 @@
 if not game:IsLoaded() or not game.Loaded then game.Loaded:Wait() end
 getgenv().test = 35
+if game.PlaceId == 606849621 then
+    print("this is jailbreak")
+end
 
 local Camera = workspace.CurrentCamera
 local LocalPlayer = game:GetService("Players").LocalPlayer
@@ -37,7 +40,7 @@ local MainESP = {
 		TracerThickness = 0,
 		DirectionThickness = 0,
 		SkeletonThickness = 0,
-        Bounties = false,
+        Bounties = false, -- jb only
 	},
 	ObjectOptions = {
 		Enabled = false,
@@ -52,6 +55,19 @@ local MainESP = {
 		TracerOrigin = "Bottom",
 		TracerThickness = 0,
 	},
+    CrateOptions = {
+        Enabled = false,
+        Tracer = false,
+        TextOutline = false,
+        Distance = false,
+        Name = false,
+        Font = 1,
+        FontSize = 20,
+        Rainbow = false,
+        Color = Color3.fromRGB(255, 165, 0),
+        TracerOrigin = "Bottom",
+        TracerThickness = 0,
+    },
     _colorCache = {},
     _positionCache = {},
 }
@@ -139,9 +155,9 @@ function MainESP:GetColor(player, useTeamColor, rainbow, defaultColor)
 end
 
 local CullingSystem = {
-    maxRenderDistance = 2000,
-    nearDistance = 500,
-    farDistance = 1000,
+    maxRenderDistance = 2000, -- studs
+    nearDistance = 500, -- studs - full detail
+    farDistance = 1000, -- studs - reduced detail
 }
 
 function CullingSystem:ShouldRenderPlayer(player)
@@ -170,8 +186,8 @@ function CullingSystem:GetDetailLevel(distance)
 end
 
 local CacheManager = {
-    maxCacheAge = 30,
-    cleanupInterval = 10,
+    maxCacheAge = 30, -- seconds
+    cleanupInterval = 10, -- seconds
     lastCleanup = 0,
 }
 
@@ -276,7 +292,7 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
         local rightUpperArm = character:FindFirstChild("RightUpperArm")
         local rightLowerArm = character:FindFirstChild("RightLowerArm")
         local leftUpperArm = character:FindFirstChild("LeftUpperArm")
-        local leftLowerArm = character:FindFirstChild("LeftLowerArm")
+        = character:FindFirstChild("LeftLowerArm")
         local rightUpperLeg = character:FindFirstChild("RightUpperLeg")
         local rightLowerLeg = character:FindFirstChild("RightLowerLeg")
         local rightFoot = character:FindFirstChild("RightFoot")
@@ -318,16 +334,16 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
             playerESP.Skeleton.NeckToLeftUpperArm.From = neckPos
             playerESP.Skeleton.NeckToLeftUpperArm.To = Vector2.new(leftUpperArmPos.X, leftUpperArmPos.Y)
             playerESP.Skeleton.NeckToLeftUpperArm.Color = color
-            playerESP.Skeleton.NeckToLeftUpperArm.Thickness = self.Options.SkeletonThickness
+            playerESP.Skeleton.NeckToLeftUpperArm.Th.SkeletonThickness
             playerESP.Skeleton.NeckToLeftUpperArm.Visible = true
             
             playerESP.Skeleton.RightUpperArmToRightLowerArm.From = Vector2.new(rightUpperArmPos.X, rightUpperArmPos.Y)
             playerESP.Skeleton.RightUpperArmToRightLowerArm.To = Vector2.new(rightLowerArmPos.X, rightLowerArmPos.Y)
             playerESP.Skeleton.RightUpperArmToRightLowerArm.Color = color
             playerESP.Skeleton.RightUpperArmToRightLowerArm.Thickness = self.Options.SkeletonThickness
-            playerESP.Skeleton.RightUpperArmToRightLowerArm.Visible = true
+            playerESP.Skeleton.RightUpperArmToRight true
             
-            playerESP.Skeleton.LeftUpperArmToLeftLowerArm.From = Vector2.new(leftUpperArmPos.X, leftUpperArmPos.Y)
+            playerESP.Skeleton.LeftUpperArmToLeft Vector2.new(leftUpperArmPos.X, leftUpperArmPos.Y)
             playerESP.Skeleton.LeftUpperArmToLeftLowerArm.To = Vector2.new(leftLowerArmPos.X, leftLowerArmPos.Y)
             playerESP.Skeleton.LeftUpperArmToLeftLowerArm.Color = color
             playerESP.Skeleton.LeftUpperArmToLeftLowerArm.Thickness = self.Options.SkeletonThickness
@@ -524,7 +540,7 @@ function MainESP:CreateESP(player, object, customName, customPredicate)
                 
                 if self.ObjectOptions.Tracer and rootPos.Z > 0 then
                     ObjectESP.Tracer.From = self.TracerOrigins[self.ObjectOptions.TracerOrigin]
-                    ObjectESP.Tracer.To = Vector2.new(rootPos.X, rootPos.Y)
+acer.To = Vector2.new(rootPos.X, rootPos.Y)
                     ObjectESP.Tracer.Color = color
                     ObjectESP.Tracer.Thickness = self.ObjectOptions.TracerThickness
                     ObjectESP.Tracer.Visible = true
@@ -546,7 +562,7 @@ function MainESP:CreateESP(player, object, customName, customPredicate)
                     ObjectESP.Info.Color = color
                     ObjectESP.Info.Font = self.ObjectOptions.Font
                     ObjectESP.Info.Size = self.ObjectOptions.FontSize
-                    ObjectESP.Info.Outline = self.ObjectOptions.TextOutline
+                    ObjectESP.Info.ObjectOptions.TextOutline
                     ObjectESP.Info.OutlineColor = Color3.fromRGB(0, 0, 0)
                     ObjectESP.Info.Visible = true
                 else
@@ -558,6 +574,88 @@ function MainESP:CreateESP(player, object, customName, customPredicate)
             end
         end)
     end
+end
+
+function MainESP:CreateCrateESP(crate)
+    local CrateESP = {
+        Info = self.CreateText(),
+        Tracer = self.CreateLine(),
+        Connections = {},
+    }
+    
+    self.Container[crate] = CrateESP
+    
+    CrateESP.Connections.AncestryConnection = crate.AncestryChanged:Connect(function()
+        if not crate:IsDescendantOf(workspace) then
+            self:RemoveESP(crate)
+        end
+    end)
+    
+    CrateESP.Connections.RenderConnection = Services.RunService.RenderStepped:Connect(function()
+        if not crate:IsDescendantOf(workspace) then
+            CrateESP.Info.Visible = false
+            CrateESP.Tracer.Visible = false
+            return
+        end
+        
+        if self.CrateOptions.Enabled then
+            local rootPos, onScreen = self.WTVP(crate.Position)
+            local color = self:GetColor(nil, false, self.CrateOptions.RainrateOptions.Color)
+            
+            if self.CrateOptions.Tracer and rootPos.Z > 0 then
+                CrateESP.Tracer.From = self.TracerOrigins[self.CrateOptions.TracerOrigin]
+                CrateESP.Tracer.To = Vector2.new(rootPos.X, rootPos.Y)
+                CrateESP.Tracer.Color = color
+                CrateESP.Tracer.Thickness = self.CrateOptions.TracerThickness
+                CrateESP.Tracer.Visible = true
+            else
+                CrateESP.Tracer.Visible = false
+            end
+            
+            if onScreen then
+                local name = "Drop"
+                local distance = ""
+                local countdown = ""
+                
+                if self.CrateOptions.Distance then
+                    local dist = math.round(self.GetDistanceFromPlayer(LocalPlayer, crate.Position))
+                    distance = "\n[" .. tostring(dist) .. " studs]"
+                end
+                
+                if self.CrateOptions.Name then
+                    local countdownPart = crate:FindFirstChild("Countdown")
+                    if countdownPart then
+                        local billboard = countdownPart:FindFirstChild("BillBoard")
+                        if billboard then
+                            local textLabel = billboard:FindFirstChild(" textLabel then
+                                countdown = "\n" .. textLabel.Text
+                            else
+                                countdown = "\n300"
+                            end
+                        else
+                            countdown = "\n300"
+                        end
+                    else
+                        countdown = "\n300"
+                    end
+                end
+                
+                CrateESP.Info.Text = name .. countdown .. distance
+                CrateESP.Info.Position = Vector2.new(rootPos.X, rootPos.Y)
+                CrateESP.Info.Color = color
+                CrateESP.Info.Font = self.CrateOptions.Font
+                CrateESP.Info.Size = self.CrateOptions.FontSize
+                CrateESP.Info.Outline = self.CrateOptions.TextOutline
+                CrateESP.Info.OutlineColor = Color3.fromRGB(0, 0, 0)
+                CrateESP.Info.Visible = true
+            else
+                CrateESP.Info.Visible = false
+            end
+        else
+            CrateESP.Info.Visible = false
+            CrateESP.Tracer.Visible = false
+        end
+    end)
 end
 
 function MainESP:HidePlayerESP(playerESP)
@@ -614,20 +712,20 @@ end
 
 local ESPPerformance = {
     lastUpdate = 0,
-    interval = 1/45,
+    interval = 1/45, -- Start with reasonable update rate (45 FPS)
     
     fpsHistory = {},
-    fpsHistorySize = 60,
+    fpsHistorySize = 60, -- Average over 60 frames
     fpsSum = 0,
     averageFPS = 60,
     lastOptimize = 0,
     
-    targetFPS = 55,
-    minInterval = 1/30,
-    maxInterval = 1/120,
+    targetFPS = 55, -- Target to maintain above this FPS
+    minInterval = 1/30,  -- Min ESP update rate (30 FPS)
+    maxInterval = 1/120, -- Max ESP update rate (120 FPS)
     
-    adjustmentRate = 0.1,
-    stabilityThreshold = 10,
+    adjustmentRate = 0.1, -- How aggressively to adjust (0.1 = 10% per adjustment)
+    stabilityThreshold = 10, -- FPS must change by this amount to trigger adjustment
 }
 
 local function updateFPSAverage()
@@ -660,11 +758,9 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
         
         if #ESPPerformance.fpsHistory >= math.min(10, ESPPerformance.fpsHistorySize) then
             if currentAvgFPS < ESPPerformance.targetFPS - ESPPerformance.stabilityThreshold then
-                local adjustment = 1 + ESPPerformance.adjustmentRate
-                ESPPerformance.interval = math.min(ESPPerformance.interval * adjustment, ESPPerformance.minInterval)
+				ESPPerformance.interval = math.min(ESPPerformance.interval * (1 + ESPPerformance.adjustmentRate), ESPPerformance.minInterval)
             elseif currentAvgFPS > ESPPerformance.targetFPS + ESPPerformance.stabilityThreshold then
-                local adjustment = 1 - ESPPerformance.adjustmentRate
-                ESPPerformance.interval = math.max(ESPPerformance.interval * adjustment, ESPPerformance.maxInterval)
+				ESPPerformance.interval = math.max(ESPPerformance.interval * (1 - ESPPerformance.adjustmentRate), ESPPerformance.maxInterval)
             end
         end
         
@@ -678,12 +774,12 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
     
     for player, playerESP in pairs(MainESP.Container) do
         if playerESP.IsPlayer then
-            if not player or not player.Parent then
+			if not player or not player.Parent then
                 MainESP:RemoveESP(player)
                 continue
             end
 
-            local shouldRender, distance = CullingSystem:ShouldRenderPlayer(player)
+			local shouldRender, distance = CullingSystem:ShouldRenderPlayer(player)
             if not shouldRender then
                 MainESP:HidePlayerESP(playerESP)
                 continue
@@ -725,7 +821,7 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
                 local dims = playerESP._BoxDimensions
                 local infoX
 
-                if detailLevel == "minimal" then
+				if detailLevel == "minimal" then
                     if MainESP.Options.Name and onScreen then
                         local dynamicOffsetY = dims.height * 1.1
                         if not infoX then
@@ -820,10 +916,10 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
                     playerESP.Name.OutlineColor = Color3.fromRGB(0, 0, 0)
                     playerESP.Name.Visible = true
                 else
-                    playerESP.Name.Visible = false
+                    player false
                 end
 
-                if MainESP.Options.Bounties and onScreen and game.PlaceId == 606849621 then -- Jb
+                if MainESP.Options.Bounties and onScreen and game.PlaceId == 606849621 then
                     if not infoX then
                         infoX = dims.x + dims.width / 2
                     end
@@ -837,8 +933,7 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
                         return nil
                     end)
 
-                    local format = (function(displayname)
-                        local uh = getUsernameFromDisplayName(displayname)
+                    local format = (function(display uh = getUsernameFromDisplayName(displayname)
                         if uh then
                             local module = require(game:GetService("ReplicatedStorage").Bounty.BountyBoardService)
                             for i,v in next, module.Bounties do
@@ -979,13 +1074,31 @@ Services.Players.PlayerAdded:Connect(function(player)
 end)
 
 Services.Players.PlayerRemoving:Connect(function(player)
-    MainESP:RemoveESP(player.Name)
-end)
+    MainESP:Removeend)
 
 for _, player in pairs(Services.Players:GetPlayers()) do
     if player ~= LocalPlayer then
         MainESP:CreateESP(player)
     end
 end
+
+local function setupCrateESP()
+    local dropFolder = workspace:FindFirstChild("Drop")
+    if dropFolder then
+        for _, drop in pairs(dropFolder:GetChildren()) do
+            if drop:IsA("Model") then
+                MainESP:CreateCrateESP(drop)
+            end
+        end
+        
+        dropFolder.ChildAdded:Connect(function(child)
+            if child:IsA("Model") then
+                MainESP:CreateCrateESP(child)
+            end
+        end)
+    end
+end
+
+setupCrateESP()
 
 return MainESP, CullingSystem
