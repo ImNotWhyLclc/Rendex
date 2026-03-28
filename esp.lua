@@ -292,7 +292,7 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
         local rightUpperArm = character:FindFirstChild("RightUpperArm")
         local rightLowerArm = character:FindFirstChild("RightLowerArm")
         local leftUpperArm = character:FindFirstChild("LeftUpperArm")
-        = character:FindFirstChild("LeftLowerArm")
+        local leftLowerArm = character:FindFirstChild("LeftLowerArm")
         local rightUpperLeg = character:FindFirstChild("RightUpperLeg")
         local rightLowerLeg = character:FindFirstChild("RightLowerLeg")
         local rightFoot = character:FindFirstChild("RightFoot")
@@ -334,16 +334,16 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
             playerESP.Skeleton.NeckToLeftUpperArm.From = neckPos
             playerESP.Skeleton.NeckToLeftUpperArm.To = Vector2.new(leftUpperArmPos.X, leftUpperArmPos.Y)
             playerESP.Skeleton.NeckToLeftUpperArm.Color = color
-            playerESP.Skeleton.NeckToLeftUpperArm.Th.SkeletonThickness
+            playerESP.Skeleton.NeckToLeftUpperArm.Thickness = self.Options.SkeletonThickness
             playerESP.Skeleton.NeckToLeftUpperArm.Visible = true
             
             playerESP.Skeleton.RightUpperArmToRightLowerArm.From = Vector2.new(rightUpperArmPos.X, rightUpperArmPos.Y)
             playerESP.Skeleton.RightUpperArmToRightLowerArm.To = Vector2.new(rightLowerArmPos.X, rightLowerArmPos.Y)
             playerESP.Skeleton.RightUpperArmToRightLowerArm.Color = color
             playerESP.Skeleton.RightUpperArmToRightLowerArm.Thickness = self.Options.SkeletonThickness
-            playerESP.Skeleton.RightUpperArmToRight true
+            playerESP.Skeleton.RightUpperArmToRightLowerArm.Visible = true
             
-            playerESP.Skeleton.LeftUpperArmToLeft Vector2.new(leftUpperArmPos.X, leftUpperArmPos.Y)
+            playerESP.Skeleton.LeftUpperArmToLeftLowerArm.From = Vector2.new(leftUpperArmPos.X, leftUpperArmPos.Y)
             playerESP.Skeleton.LeftUpperArmToLeftLowerArm.To = Vector2.new(leftLowerArmPos.X, leftLowerArmPos.Y)
             playerESP.Skeleton.LeftUpperArmToLeftLowerArm.Color = color
             playerESP.Skeleton.LeftUpperArmToLeftLowerArm.Thickness = self.Options.SkeletonThickness
@@ -540,7 +540,7 @@ function MainESP:CreateESP(player, object, customName, customPredicate)
                 
                 if self.ObjectOptions.Tracer and rootPos.Z > 0 then
                     ObjectESP.Tracer.From = self.TracerOrigins[self.ObjectOptions.TracerOrigin]
-acer.To = Vector2.new(rootPos.X, rootPos.Y)
+                    ObjectESP.Tracer.To = Vector2.new(rootPos.X, rootPos.Y)
                     ObjectESP.Tracer.Color = color
                     ObjectESP.Tracer.Thickness = self.ObjectOptions.TracerThickness
                     ObjectESP.Tracer.Visible = true
@@ -562,7 +562,7 @@ acer.To = Vector2.new(rootPos.X, rootPos.Y)
                     ObjectESP.Info.Color = color
                     ObjectESP.Info.Font = self.ObjectOptions.Font
                     ObjectESP.Info.Size = self.ObjectOptions.FontSize
-                    ObjectESP.Info.ObjectOptions.TextOutline
+                    ObjectESP.Info.Outline = self.ObjectOptions.TextOutline
                     ObjectESP.Info.OutlineColor = Color3.fromRGB(0, 0, 0)
                     ObjectESP.Info.Visible = true
                 else
@@ -600,7 +600,7 @@ function MainESP:CreateCrateESP(crate)
         
         if self.CrateOptions.Enabled then
             local rootPos, onScreen = self.WTVP(crate.Position)
-            local color = self:GetColor(nil, false, self.CrateOptions.RainrateOptions.Color)
+            local color = self:GetColor(nil, false, self.CrateOptions.Rainbow, self.CrateOptions.Color)
             
             if self.CrateOptions.Tracer and rootPos.Z > 0 then
                 CrateESP.Tracer.From = self.TracerOrigins[self.CrateOptions.TracerOrigin]
@@ -627,7 +627,8 @@ function MainESP:CreateCrateESP(crate)
                     if countdownPart then
                         local billboard = countdownPart:FindFirstChild("BillBoard")
                         if billboard then
-                            local textLabel = billboard:FindFirstChild(" textLabel then
+                            local textLabel = billboard:FindFirstChild("TextLabel")
+                            if textLabel then
                                 countdown = "\n" .. textLabel.Text
                             else
                                 countdown = "\n300"
@@ -916,7 +917,7 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
                     playerESP.Name.OutlineColor = Color3.fromRGB(0, 0, 0)
                     playerESP.Name.Visible = true
                 else
-                    player false
+                    playerESP.Name.Visible = false
                 end
 
                 if MainESP.Options.Bounties and onScreen and game.PlaceId == 606849621 then
@@ -933,7 +934,8 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
                         return nil
                     end)
 
-                    local format = (function(display uh = getUsernameFromDisplayName(displayname)
+                    local format = (function(displayname)
+                        local uh = getUsernameFromDisplayName(displayname)
                         if uh then
                             local module = require(game:GetService("ReplicatedStorage").Bounty.BountyBoardService)
                             for i,v in next, module.Bounties do
@@ -1074,7 +1076,8 @@ Services.Players.PlayerAdded:Connect(function(player)
 end)
 
 Services.Players.PlayerRemoving:Connect(function(player)
-    MainESP:Removeend)
+    MainESP:RemoveESP(player)
+end)
 
 for _, player in pairs(Services.Players:GetPlayers()) do
     if player ~= LocalPlayer then
