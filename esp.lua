@@ -157,7 +157,9 @@ local CullingSystem = {
 function CullingSystem:ShouldRenderPlayer(player)
     if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
         return false
-    end MainESP.GetDistanceFromPlayer(player, 
+    end
+
+	local distance = MainESP.GetDistanceFromPlayer(player, 
 		MainESP:PlayerAlive(LocalPlayer) and LocalPlayer.Character.HumanoidRootPart.Position or Camera.CFrame.Position)
     
     if distance > self.maxRenderDistance then
@@ -318,7 +320,7 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
             local rightLowerArmPos = MainESP:GetCachedPosition(rightLowerArm, "RightLowerArm", player)
             local leftUpperArmPos = MainESP:GetCachedPosition(leftUpperArm, "LeftUpperArm", player)
             local leftLowerArmPos = MainESP:GetCachedPosition(leftLowerArm, "LeftLowerArm", player)
-            local:GetCachedPosition(rightUpperLeg, "RightUpperLeg", player)
+            local rightUpperLegPos = MainESP:GetCachedPosition(rightUpperLeg, "RightUpperLeg", player)
             local rightLowerLegPos = MainESP:GetCachedPosition(rightLowerLeg, "RightLowerLeg", player)
             local rightFootPos = MainESP:GetCachedPosition(rightFoot, "RightFoot", player)
             local leftUpperLegPos = MainESP:GetCachedPosition(leftUpperLeg, "LeftUpperLeg", player)
@@ -355,7 +357,7 @@ function MainESP:UpdateSkeleton(playerESP, player, onScreen)
             playerESP.Skeleton.RightUpperArmToRightLowerArm.Thickness = self.Options.SkeletonThickness
             playerESP.Skeleton.RightUpperArmToRightLowerArm.Visible = true
             
-keleton.LeftUpperArmToLeftLowerArm.From = Vector2.new(leftUpperArmPos.X, leftUpperArmPos.Y)
+            playerESP.Skeleton.LeftUpperArmToLeftLowerArm.From = Vector2.new(leftUpperArmPos.X, leftUpperArmPos.Y)
             playerESP.Skeleton.LeftUpperArmToLeftLowerArm.To = Vector2.new(leftLowerArmPos.X, leftLowerArmPos.Y)
             playerESP.Skeleton.LeftUpperArmToLeftLowerArm.Color = color
             playerESP.Skeleton.LeftUpperArmToLeftLowerArm.Thickness = self.Options.SkeletonThickness
@@ -517,7 +519,8 @@ keleton.LeftUpperArmToLeftLowerArm.From = Vector2.new(leftUpperArmPos.X, leftUpp
     end
 end
 
---[[ Main ESP Creation ]]:CreateESP(player, object, customName, customPredicate)
+--[[ Main ESP Creation ]]--
+function MainESP:CreateESP(player, object, customName, customPredicate)
     if player then
         local PlayerESP = {
             IsPlayer = true,
@@ -675,7 +678,7 @@ local ESPPerformance = {
     -- Performance thresholds
     targetFPS = 55, -- Target to maintain above this FPS
     minInterval = 1/30,  -- Min ESP update rate (30 FPS)
-    maxInterval =20, -- Max ESP update rate (120 FPS)
+    maxInterval = 1/120, -- Max ESP update rate (120 FPS)
     
     -- Smoothing factors
     adjustmentRate = 0.1, -- How aggressively to adjust (0.1 = 10% per adjustment)
@@ -693,7 +696,7 @@ local function updateFPSAverage()
     if #ESPPerformance.fpsHistory > ESPPerformance.fpsHistorySize then
 		local overflow = #ESPPerformance.fpsHistory - ESPPerformance.fpsHistorySize
 		for _ = 1, overflow do
-			ESPPerformance.fpsSum -= table.remove(ESP, 1)
+			ESPPerformance.fpsSum -= table.remove(ESPPerformance.fpsHistory, 1)
 		end
 	end
     
@@ -783,7 +786,7 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
                 local rootPos, onScreen = MainESP:GetCachedPosition(rootPart, "RootPart", player, true)
 				local headPos = MainESP:GetCachedPosition(head, "Head", player)
                 local topPos = MainESP.WTVP(rootPart.Position + Vector3.new(0, characterSizeHalved.Y, 0))
-                local bottomPos = MainESP.WTVP(rootPart.new(0, characterSizeHalved.Y, 0))
+                local bottomPos = MainESP.WTVP(rootPart.Position - Vector3.new(0, characterSizeHalved.Y, 0))
                 
                 local color = MainESP:GetColor(player, MainESP.Options.UseTeamColor, MainESP.Options.Rainbow, MainESP.Options.Color)
 
@@ -992,7 +995,7 @@ local CompatibilityFuncs = {
         for _, v in pairs(getgc(true)) do
             if type(v) == "function" and islclosure(v) then
                 local constants = getconstants(v)
-                if get == "gethealth" and table.find(constants, "alive") then
+                if getinfo(v).name == "gethealth" and table.find(constants, "alive") then
                     MainESP.GetHealth = v
                 end
             elseif type(v) == "table" and rawget(v, "getbodyparts") then
@@ -1078,7 +1081,7 @@ for _, player in pairs(Services.Players:GetPlayers()) do
 end
 
 workspace.ChildAdded:Connect(function(child)
-    if child.Name == "Drop" and child:FindFirstChild("Root") then
+    if game.PlaceId == 606849621 and child.Name == "Drop" and child:FindFirstChild("Root") then
         wait(0.1)
         MainESP:CreateESP(nil, child.Root, "Crate", function(obj) 
             return obj.Name == "Root" and obj.Parent.Name == "Drop"
@@ -1087,7 +1090,7 @@ workspace.ChildAdded:Connect(function(child)
 end)
 
 for _, drop in pairs(workspace:GetChildren()) do
-    if drop.Name == "Drop" and drop:FindFirstChild("Root") then
+    if game.PlaceId == 606849621 and drop.Name == "Drop" and drop:FindFirstChild("Root") then
         MainESP:CreateESP(nil, drop.Root, "Crate", function(obj) 
             return obj.Name == "Root" and obj.Parent.Name == "Drop"
         end)
