@@ -1024,26 +1024,48 @@ local CompatibilityFuncs = {
     end,
 
     [8307114974] = function() -- Operation One
-    local viewmodel = workspace.Viewmodels:FindFirstChild("Viewmodel")
-    if viewmodel then
-        for _, part in pairs(viewmodel:GetChildren()) do
-            if part:IsA("BasePart") then
-                MainESP:CreateESP(nil, part, "VM Part", function(obj)
-                    return obj.Parent.Name == "Viewmodel" and obj.Parent.Parent.Name == "Viewmodels"
+        for _, viewmodel in pairs(workspace.Viewmodels:GetChildren()) do
+            if viewmodel.Name == "Viewmodel" and viewmodel:IsA("Model") then
+                for _, part in pairs(viewmodel:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        MainESP:CreateESP(nil, part, "Viewmodel", function(obj)
+                            return obj.Parent.Name == "Viewmodel" and obj.Parent.Parent.Name == "Viewmodels"
+                        end)
+                    end
+                end
+                
+                viewmodel.ChildAdded:Connect(function(child)
+                    if child:IsA("BasePart") then
+                        wait(0.1)
+                        MainESP:CreateESP(nil, child, "Viewmodel", function(obj)
+                            return obj.Parent.Name == "Viewmodel" and obj.Parent.Parent.Name == "Viewmodels"
+                        end)
+                    end
                 end)
             end
         end
         
-        viewmodel.ChildAdded:Connect(function(child)
-            if child:IsA("BasePart") then
-                wait(0.1)
-                MainESP:CreateESP(nil, child, "VM Part", function(obj)
-                    return obj.Parent.Name == "Viewmodel" and obj.Parent.Parent.Name == "Viewmodels"
+        workspace.Viewmodels.ChildAdded:Connect(function(child)
+            if child.Name == "Viewmodel" and child:IsA("Model") then
+                for _, part in pairs(child:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        MainESP:CreateESP(nil, part, "Viewmodel", function(obj)
+                            return obj.Parent.Name == "Viewmodel" and obj.Parent.Parent.Name == "Viewmodels"
+                        end)
+                    end
+                end
+                
+                child.ChildAdded:Connect(function(subchild)
+                    if subchild:IsA("BasePart") then
+                        wait(0.1)
+                        MainESP:CreateESP(nil, subchild, "Viewmodel", function(obj)
+                            return obj.Parent.Name == "Viewmodel" and obj.Parent.Parent.Name == "Viewmodels"
+                        end)
+                    end
                 end)
             end
         end)
-    end
-end,
+    end,
     
     [142823291] = function() -- Murder Mystery 2
         local murderTeam = Instance.new("Team")
