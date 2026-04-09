@@ -1022,6 +1022,28 @@ local CompatibilityFuncs = {
             return player.NRPBS.Health.Value, 100
         end
     end,
+
+    [8307114974] = function() -- Operation One
+    local viewmodel = workspace.Viewmodels:FindFirstChild("Viewmodel")
+    if viewmodel then
+        for _, part in pairs(viewmodel:GetChildren()) do
+            if part:IsA("BasePart") then
+                MainESP:CreateESP(nil, part, "VM Part", function(obj)
+                    return obj.Parent.Name == "Viewmodel" and obj.Parent.Parent.Name == "Viewmodels"
+                end)
+            end
+        end
+        
+        viewmodel.ChildAdded:Connect(function(child)
+            if child:IsA("BasePart") then
+                wait(0.1)
+                MainESP:CreateESP(nil, child, "VM Part", function(obj)
+                    return obj.Parent.Name == "Viewmodel" and obj.Parent.Parent.Name == "Viewmodels"
+                end)
+            end
+        end)
+    end
+end,
     
     [142823291] = function() -- Murder Mystery 2
         local murderTeam = Instance.new("Team")
