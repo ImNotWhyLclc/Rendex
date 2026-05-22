@@ -44,6 +44,7 @@ local MainESP = {
 	},
 	ObjectOptions = {
 		Enabled = false,
+        Box = false,
 		Tracer = false,
 		TextOutline = false,
 		Distance = false,
@@ -64,7 +65,7 @@ local MainESP = {
         Font = 1,
         FontSize = 20,
         Rainbow = false,
-        Color = Color3.fromRGB(255, 165, 0),
+        Color = Color3.fromRGB(148, 96, 69),
         TracerOrigin = "Bottom",
         TracerThickness = 0,
     },
@@ -599,9 +600,10 @@ function MainESP:CreateCrateESP(crate)
         end
         
         if self.CrateOptions.Enabled then
-            local rootPos, onScreen = self.WTVP(crate.Position)
+            local cf, size = crate:GetBoundingBox()
+            local rootPos, onScreen = self.WTVP(cf.Position)
             local color = self:GetColor(nil, false, self.CrateOptions.Rainbow, self.CrateOptions.Color)
-            
+
             if self.CrateOptions.Tracer and rootPos.Z > 0 then
                 CrateESP.Tracer.From = self.TracerOrigins[self.CrateOptions.TracerOrigin]
                 CrateESP.Tracer.To = Vector2.new(rootPos.X, rootPos.Y)
@@ -618,7 +620,7 @@ function MainESP:CreateCrateESP(crate)
                 local countdown = ""
                 
                 if self.CrateOptions.Distance then
-                    local dist = math.round(self.GetDistanceFromPlayer(LocalPlayer, crate.Position))
+                    local dist = math.round(self.GetDistanceFromPlayer(LocalPlayer, cf.Position))
                     distance = "\n[" .. tostring(dist) .. " studs]"
                 end
                 
@@ -1132,15 +1134,15 @@ for _, player in pairs(Services.Players:GetPlayers()) do
 end
 
 local function setupCrateESP()
-    local dropFolder = workspace:FindFirstChild("Drop")
-    if dropFolder then
-        for _, drop in pairs(dropFolder:GetChildren()) do
+    local drop = workspace:FindFirstChild("Drop")
+    if drop then
+        for _, drop in pairs(drop:GetChildren()) do
             if drop:IsA("Model") then
                 MainESP:CreateCrateESP(drop)
             end
         end
         
-        dropFolder.ChildAdded:Connect(function(child)
+        drop.ChildAdded:Connect(function(child)
             if child:IsA("Model") then
                 MainESP:CreateCrateESP(child)
             end
