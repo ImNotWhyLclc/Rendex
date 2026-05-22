@@ -65,7 +65,7 @@ local MainESP = {
         Font = 1,
         FontSize = 20,
         Rainbow = false,
-        Color = Color3.fromRGB(148, 96, 69),
+        Color = (workspace:FindFirstChild("Drop") and workspace.Drop:FindFirstChild("Top") and workspace.Drop.Top:IsA("BasePart") and workspace.Drop.Top.Color) or Color3.fromRGB(148, 96, 69),
         TracerOrigin = "Bottom",
         TracerThickness = 0,
     },
@@ -602,7 +602,14 @@ function MainESP:CreateCrateESP(crate)
         if self.CrateOptions.Enabled then
             local cf, size = crate:GetBoundingBox()
             local rootPos, onScreen = self.WTVP(cf.Position)
-            local color = self:GetColor(nil, false, self.CrateOptions.Rainbow, self.CrateOptions.Color)
+            
+            local topPart = crate:FindFirstChild("Top")
+            local color
+            if topPart and topPart:IsA("BasePart") then
+                color = topPart.Color
+            else
+                color = self:GetColor(nil, false, self.CrateOptions.Rainbow, self.CrateOptions.Color)
+            end
 
             if self.CrateOptions.Tracer and rootPos.Z > 0 then
                 CrateESP.Tracer.From = self.TracerOrigins[self.CrateOptions.TracerOrigin]
@@ -615,42 +622,37 @@ function MainESP:CreateCrateESP(crate)
             end
             
             if onScreen then
-                local name = "Drop"
-                local distance = ""
+                local name = ""
                 local countdown = ""
-                
+                local distance = ""
+
+                if self.CrateOptions.Name then
+                    name = "Drop"
+                    local textLabel = crate:FindFirstChildWhichIsA("TextLabel", true)
+                    if textLabel then
+                        countdown = "\n" .. textLabel.Text
+                    end
+                end
+
                 if self.CrateOptions.Distance then
                     local dist = math.round(self.GetDistanceFromPlayer(LocalPlayer, cf.Position))
                     distance = "\n[" .. tostring(dist) .. " studs]"
                 end
                 
-                if self.CrateOptions.Name then
-                    local countdownPart = crate:FindFirstChild("Countdown")
-                    if countdownPart then
-                        local billboard = countdownPart:FindFirstChild("BillBoard")
-                        if billboard then
-                            local textLabel = billboard:FindFirstChild("TextLabel")
-                            if textLabel then
-                                countdown = "\n" .. textLabel.Text
-                            else
-                                countdown = "\n300"
-                            end
-                        else
-                            countdown = "\n300"
-                        end
-                    else
-                        countdown = "\n300"
-                    end
-                end
+                local finalText = name .. countdown .. distance
                 
-                CrateESP.Info.Text = name .. countdown .. distance
-                CrateESP.Info.Position = Vector2.new(rootPos.X, rootPos.Y)
-                CrateESP.Info.Color = color
-                CrateESP.Info.Font = self.CrateOptions.Font
-                CrateESP.Info.Size = self.CrateOptions.FontSize
-                CrateESP.Info.Outline = self.CrateOptions.TextOutline
-                CrateESP.Info.OutlineColor = Color3.fromRGB(0, 0, 0)
-                CrateESP.Info.Visible = true
+                if finalText ~= "" then
+                    CrateESP.Info.Text = finalText
+                    CrateESP.Info.Position = Vector2.new(rootPos.X, rootPos.Y)
+                    CrateESP.Info.Color = color
+                    CrateESP.Info.Font = self.CrateOptions.Font
+                    CrateESP.Info.Size = self.CrateOptions.FontSize
+                    CrateESP.Info.Outline = self.CrateOptions.TextOutline
+                    CrateESP.Info.OutlineColor = Color3.fromRGB(0, 0, 0)
+                    CrateESP.Info.Visible = true
+                else
+                    CrateESP.Info.Visible = false
+                end
             else
                 CrateESP.Info.Visible = false
             end
