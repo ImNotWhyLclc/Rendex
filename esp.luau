@@ -57,6 +57,7 @@ local MainESP = {
 	},
     CrateOptions = {
         Enabled = false,
+        Box = false,
         Tracer = false,
         TextOutline = false,
         Distance = false,
@@ -64,9 +65,10 @@ local MainESP = {
         Font = 1,
         FontSize = 20,
         Rainbow = false,
-        Color = Color3.fromRGB(255, 165, 0),
+        Color = Color3.fromRGB(148, 96, 69),
         TracerOrigin = "Bottom",
         TracerThickness = 0,
+        BoxThickness = 1,
     },
     _colorCache = {},
     _positionCache = {},
@@ -580,6 +582,7 @@ function MainESP:CreateCrateESP(crate)
     local CrateESP = {
         Info = self.CreateText(),
         Tracer = self.CreateLine(),
+        Box = self.CreateBox(),
         Connections = {},
     }
     
@@ -595,13 +598,52 @@ function MainESP:CreateCrateESP(crate)
         if not crate:IsDescendantOf(workspace) then
             CrateESP.Info.Visible = false
             CrateESP.Tracer.Visible = false
+            CrateESP.Box.Visible = false
             return
         end
         
         if self.CrateOptions.Enabled then
-            local rootPos, onScreen = self.WTVP(crate.Position)
+            local cf, size = crate:GetBoundingBox()
+            local rootPos, onScreen = self.WTVP(cf.Position)
             local color = self:GetColor(nil, false, self.CrateOptions.Rainbow, self.CrateOptions.Color)
             
+            if self.CrateOptions.Box and onScreen then
+                local halfSize = size / 2
+                local corners = {
+                    cf * CFrame.new(halfSize.X, halfSize.Y, halfSize.Z),
+                    cf * CFrame.new(-halfSize.X, halfSize.Y, halfSize.Z),
+                    cf * CFrame.new(halfSize.X, -halfSize.Y, halfSize.Z),
+                    cf * CFrame.new(-halfSize.X, -halfSize.Y, halfSize.Z),
+                    cf * CFrame.new(halfSize.X, halfSize.Y, -halfSize.Z),
+                    cf * CFrame.new(-halfSize.X, halfSize.Y, -halfSize.Z),
+                    cf * CFrame.new(halfSize.X, -halfSize.Y, -halfSize.Z),
+                    cf * CFrame.new(-halfSize.X, -halfSize.Y, -halfSize.Z),
+                }
+                
+                local minX, maxX, minY, maxY = math.huge, -math.huge, math.huge, -math.huge
+                for _, corner in ipairs(corners) do
+                    local pos, _ = self.WTVP(corner.Position)
+                    if pos.Z > 0 then
+                        if pos.X < minX then minX = pos.X end
+                        if pos.X > maxX then maxX = pos.X end
+                        if pos.Y < minY then minY = pos.Y end
+                        if pos.Y > maxY then maxY = pos.Y end
+                    end
+                end
+                
+                if minX ~= math.huge then
+                    CrateESP.Box.Size = Vector2.new(maxX - minX, maxY - minY)
+                    CrateESP.Box.Position = Vector2.new(minX, minY)
+                    CrateESP.Box.Color = color
+                    CrateESP.Box.Thickness = self.CrateOptions.BoxThickness
+                    CrateESP.Box.Visible = true
+                else
+                    CrateESP.Box.Visible = false
+                end
+            else
+                CrateESP.Box.Visible = false
+            end
+
             if self.CrateOptions.Tracer and rootPos.Z > 0 then
                 CrateESP.Tracer.From = self.TracerOrigins[self.CrateOptions.TracerOrigin]
                 CrateESP.Tracer.To = Vector2.new(rootPos.X, rootPos.Y)
@@ -618,7 +660,7 @@ function MainESP:CreateCrateESP(crate)
                 local countdown = ""
                 
                 if self.CrateOptions.Distance then
-                    local dist = math.round(self.GetDistanceFromPlayer(LocalPlayer, crate.Position))
+                    local dist = math.round(self.GetDistanceFromPlayer(LocalPlayer, cf.Position))
                     distance = "\n[" .. tostring(dist) .. " studs]"
                 end
                 
@@ -655,6 +697,7 @@ function MainESP:CreateCrateESP(crate)
         else
             CrateESP.Info.Visible = false
             CrateESP.Tracer.Visible = false
+            CrateESP.Box.Visible = false
         end
     end)
 end
