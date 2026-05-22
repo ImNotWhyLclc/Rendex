@@ -622,15 +622,20 @@ function MainESP:CreateCrateESP(crate)
             end
             
             if onScreen then
-                local name = ""
+                local name = self.CrateOptions.Name and "Drop" or ""
                 local countdown = ""
                 local distance = ""
-
-                if self.CrateOptions.Name then
-                    name = "Drop"
-                    local textLabel = crate:FindFirstChildWhichIsA("TextLabel", true)
-                    if textLabel then
-                        countdown = "\n" .. textLabel.Text
+                
+                local dropFolder = crate.Parent
+                local countdownPart = dropFolder and dropFolder:FindFirstChild("Countdown")
+                
+                if countdownPart then
+                    local billboard = countdownPart:FindFirstChild("Billboard")
+                    if billboard then
+                        local textLabel = billboard:FindFirstChild("TextLabel")
+                        if textLabel then
+                            countdown = "\n" .. textLabel.Text
+                        end
                     end
                 end
 
