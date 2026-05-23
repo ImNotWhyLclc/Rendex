@@ -1141,20 +1141,39 @@ for _, player in pairs(Services.Players:GetPlayers()) do
 end
 
 local function setupCrateESP()
-    local drop = workspace:FindFirstChild("Drop")
-    if drop then
-        for _, drop in pairs(drop:GetChildren()) do
-            if drop:IsA("Model") then
-                MainESP:CreateCrateESP(drop)
+    local function isValidCrate(model)
+        return model:IsA("Model") and model:FindFirstChild("Top") and not MainESP.Container[model]
+    end
+
+    local function handleDropModel(dropModel)
+        if isValidCrate(dropModel) then
+            MainESP:CreateCrateESP(dropModel)
+        end
+
+        for _, descendant in pairs(dropModel:GetDescendants()) do
+            if isValidCrate(descendant) then
+                MainESP:CreateCrateESP(descendant)
             end
         end
         
-        drop.ChildAdded:Connect(function(child)
-            if child:IsA("Model") then
-                MainESP:CreateCrateESP(child)
+        dropModel.DescendantAdded:Connect(function(descendant)
+            if isValidCrate(descendant) then
+                MainESP:CreateCrateESP(descendant)
             end
         end)
     end
+
+    for _, child in pairs(workspace:GetChildren()) do
+        if child.Name == "Drop" and child:IsA("Model") then
+            handleDropModel(child)
+        end
+    end
+
+    workspace.ChildAdded:Connect(function(child)
+        if child.Name == "Drop" and child:IsA("Model") then
+            handleDropModel(child)
+        end
+    end)
 end
 
 setupCrateESP()
