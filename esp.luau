@@ -600,8 +600,10 @@ function MainESP:CreateCrateESP(crate)
         end
         
         if self.CrateOptions.Enabled then
-            local cf, size = crate:GetBoundingBox()
-            local rootPos, onScreen = self.WTVP(cf.Position)
+            local particles = crate:FindFirstChild("Particles")
+            local targetPosition = (particles and (particles:IsA("BasePart") and particles.Position or particles:IsA("Attachment") and particles.WorldPosition)) or crate:GetBoundingBox().Position
+            
+            local rootPos, onScreen = self.WTVP(targetPosition)
             
             local topPart = crate:FindFirstChild("Top")
             local color
@@ -640,7 +642,7 @@ function MainESP:CreateCrateESP(crate)
                 end
 
                 if self.CrateOptions.Distance then
-                    local dist = math.round(self.GetDistanceFromPlayer(LocalPlayer, cf.Position))
+                    local dist = math.round(self.GetDistanceFromPlayer(LocalPlayer, targetPosition))
                     distance = "\n[" .. tostring(dist) .. " studs]"
                 end
                 
