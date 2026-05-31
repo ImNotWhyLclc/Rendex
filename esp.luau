@@ -1,6 +1,12 @@
 if not game:IsLoaded() or not game.Loaded then game.Loaded:Wait() end
 getgenv().test = 35
-if game.PlaceId == 606849621 then
+local jailbreak = {
+    [606849621] = true,
+    [17190407811] = true,
+    [108098425719662] = true
+}
+
+if jailbreak[game.PlaceId] then
     print("this is jailbreak")
 end
 
@@ -506,7 +512,7 @@ function MainESP:CreateESP(player, object, customName, customPredicate)
 			_BoxDimensions = { width = 0, height = 0, x = 0, y = 0 },
         }
 
-        if game.PlaceId == 606849621 then
+        if jailbreak[game.PlaceId] then
             PlayerESP.Bounties = self.CreateText()
         end
         
@@ -931,7 +937,7 @@ local globalRenderConnection = Services.RunService.RenderStepped:Connect(functio
                     playerESP.Name.Visible = false
                 end
 
-                if MainESP.Options.Bounties and onScreen and game.PlaceId == 606849621 then
+                if MainESP.Options.Bounties and onScreen and jailbreak[game.PlaceId] then
                     if not infoX then
                         infoX = dims.x + dims.width / 2
                     end
