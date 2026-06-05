@@ -1,0 +1,215 @@
+Player Tab:
+  ["Movement"] Section:
+    - "[+] Player Flight"
+    - "[+] Flight Speed"
+    - "[+] Always Sprinting"
+    - "[+] Always Juiced"
+    - "[+] Noclip"
+    - "[+] Infinite Jump"
+
+  ["Interactions"] Section:
+    - "[+] Pickpocket Aura"
+    - "[+] Arrest Aura"
+    - "[+] Breakout Aura"
+
+  ["Mechanics"] Section:
+    - "[+] Anti Ragdoll"
+    - "[+] Anti Fall Injury"
+    - "[+] Anti Skydiving"
+    - "[+] Anti Ragdoll Stun"
+    - "[+] Anti Injury Slow"
+    - "[+] Anti Crawling Slow"
+    - "[+] Allow Equip When Crawling"
+    - "[+] Anti Locked Items"
+    - "[+] Anti Spotlight Slow"
+    - "[+] Enable Movement Roll"
+    - "[+] No Roll Cooldown"
+    - "[+] No Circle Action Wait"
+    - "[+] Circle Anti Clipping"
+
+  ["Minimap"] Section:
+    - "[+] Anti Minimap Flash"
+    - "[+] Always Show Player Marker"
+
+Vehicle Tab:
+  ["General"] Section:
+    - "[+] Vehicle Flight"
+    - "[+] Flight Speed"
+    - "[+] Add Jump Action"
+    - "[+] Anti Jump Action Wait"
+    - "[+] Infinite Nitro"
+
+  ["Car"] Section:
+    - "[+] Engine Speed"
+    - "[+] Apply Engine Speed"
+    - "[+] Brakes"
+    - "[+] Apply Breaks"
+    - "[+] Suspension Height"
+    - "[+] Apply Suspension Height"
+    - "[+] Turn Speed"
+    - "[+] Apply Turn Speed"
+    - "[+] Anti Tire Pop"
+    - "[+] Drive On Water"
+    - "[+] Always Flip"
+    - "[+] Instant Tow"
+
+  ["Helicopter"] Section:
+    - "[+] Engine Forward Speed"
+    - "[+] Engine Vertical Speed"
+    - "[+] Apply Modification"
+    - "[+] Instant Heli Pickup"
+    - "[+] Anti Heli Down"
+    - "[+] Infinite Heli Height"
+
+  ["Garage"] Section:
+    - "[+] Choose Save Slot"
+    - "[+] Load Save Slot"
+    - "[+] Auto Load Save Slot"
+    - "[+] Auto Load Last Selection"
+    - "[+] Always Show Favorited"
+
+  ["Motorbike"] Section:
+    - "[+] Speed Multiplier"
+    - "[+] Suspension Height Multiplier"
+
+  ["Tank"] Section:
+    - "[+] Tracks Height"
+
+  ["Volt"] Section:
+    - "[+] Speed Multiplier"
+    - "[+] Wheel Height"
+    - "[+] Anti Pop Tire"
+
+Robberies Tab:
+  ["General"] Section:
+    - "[+] Disable Guard"
+    - "[+] Auto Numberlink Solve"
+    - "[+] Solve Delay"
+
+  ["Bank"] Section:
+    - "[+] No Lasers"
+    - "[+] Auto Place Dynamite"
+
+  ["Jewelry Store"] Section:
+    - "[+] No Lasers"
+
+  ["Museum"] Section:
+    - "[+] No Lasers"
+
+  ["Casino"] Section:
+    - "[+] Code Display"
+    - "[+] Copy Code"
+    - "[+] Auto Notify Code"
+    - "[+] No Lasers"
+    - "[+] Hack Computer"
+    - "[+] Auto Collect Cash"
+    - "[+] Auto Open Door"
+    - "[+] Choose Elevator Floor"
+    - "[+] Call Elevator"
+
+  ["Tomb"] Section:
+    - "[+] No Planks"
+    - "[+] No Spikes"
+    - "[+] No Darts"
+
+  ["Oil Rig"] Section:
+    - "[+] No Lasers"
+    - "[+] Disable Turret"
+    - "[+] Disable Self Destruct"
+
+  ["Cargo Ship"] Section:
+    - "[+] Disable Turret"
+
+  ["Mansion"] Section:
+    - "[+] No Lasers"
+    - "[+] No Traps"
+    - "[+] Auto Enter Elevator"
+    - "[+] Invites Counter"
+
+  ["Power Plant"] Section:
+    - "[+] No Lasers"
+    - "[+] No Pistons"
+
+Combat Tab:
+  ["Utilities"] Section:
+    - "[+] Instant Reload"
+    - "[+] Plasma Wallbang"
+    - "[+] Always Auto"
+    - "[+] Anti Recoil"
+    - "[+] Anti Spread"
+    - "[+] Anti Equip Time"
+    - "[+] Bullet Criticals"
+    - "[+] Instant Bullet Hit"
+    - "[+] Increase Takedown Damage"
+    - "[+] Shoot Through Forcefield"
+    - "[+] Rocket Instant Seek"
+    - "[+] Free Pistol Swat"
+    - "[+] Fast Taser"
+    - "[+] Faster Forcefield Reload"
+    - "[+] Anti Forcefield Misses"
+    - "[+] Anti Smoke Grenade Effect"
+    - "[+] Anti Smoke Grenade Limit"
+
+  ["Melee"] Section:
+    - "[+] Anti Reload Time"
+    - "[+] Always Swoosh"
+    - "[+] Always Lunge"
+
+  ["Silent Aim"] Section:
+    - "[+] Enabled"
+    - "[+] Include NPCs"
+    - "[+] Wallcheck"
+    - "[+] Include Taser"
+    - "[+] Include Plasma"
+    - "[+] FOV Circle"
+    - "[+] FOV Circle Filled"
+    - "[+] Range"
+    - "[+] Radius"
+
+  ["Gun Store"] Section:
+    - "[+] Get All Owned Gun"
+    - "[+] Open Gunstore UI"
+
+Visual Tab:
+  ["ESP Options"] Section:
+    - "[+] Enabled"
+    - "[+] Bounties"
+    - "[+] Box"
+    - "[+] Tracer"
+    - "[+] Name"
+    - "[+] Distance"
+    - "[+] Health"
+    - "[+] Skeleton"
+
+  ["ESP Settings"] Section:
+    - "[+] Team Check"
+    - "[+] Use Team Color"
+    - "[+] Rainbow"
+    - "[+] Text Outline"
+    - "[+] Text Size"
+    - "[+] Tracer Origins"
+
+  ["Airdrop ESP Options"] Section:
+    - "[+] Enabled"
+    - "[+] Tracer"
+    - "[+] Name"
+    - "[+] Distance"
+
+  ["Airdrop ESP Settings"] Section:
+    - "[+] Rainbow"
+    - "[+] Text Outline"
+    - "[+] Airdrop Text Size"
+    - "[+] Tracer Origins"
+
+Miscellaneous Tab:
+  ["Military"] Section:
+    - "[+] Disable Military Turrets"
+
+  ["Protections"] Section:
+    - "[+] Disable Home Turret"
+
+  ["Fun"] Section:
+    - "[+] Open All Doors & Gates"
+    - "[+] Open All Sewer Hatch"
+    - "[+] Break Prison Elevator"
+    - "[+] Break Casino Elevator"
