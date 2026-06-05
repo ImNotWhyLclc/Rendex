@@ -111,6 +111,8 @@ Robberies Tab:
     - "[+] No Planks"
     - "[+] No Spikes"
     - "[+] No Darts"
+    - "[+] Disable Bridge Break"
+    - "[+] No Lava"
 
   ["Oil Rig"] Section:
     - "[+] No Lasers"
