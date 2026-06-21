@@ -1,1 +1,1 @@
-loadstring(game:HttpGet("https://lua.services/api/scripts/812c1737194555ae37963b40f906c933/loader"))()
+loadstring(game:HttpGet("https://redstoneguard.xyz/api/loader/3ea11519-ac35-4362-ae2c-3cae5f144ce0/init"))()
