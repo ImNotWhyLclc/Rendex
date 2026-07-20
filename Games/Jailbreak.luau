@@ -1,1 +1,1 @@
-loadstring(game:HttpGet("https://raw.soteria.rip/6e52477779765335"))()
+loadstring(game:HttpGet("https://lua.services/api/scripts/812c1737194555ae37963b40f906c933/loader"))()
