@@ -1,4 +1,5 @@
-local base = "https://raw.githubusercontent.com/ImNotWhyLclc/Rendex/main/"
+local base = "https://raw.githubusercontent.com/ImNotWhyLclc/Rendex/refs/heads/main/"
+
 local hm = {
     [606849621] = "Games/Jailbreak.luau",
     [17190407811] = "Games/Jailbreak.luau",
@@ -8,12 +9,20 @@ local hm = {
     [126509999114328] = "Games/Rendex99NITF.luau",
     [127742093697776] = "Games/RendexPVB.luau"
 }
+
 local file = hm[game.PlaceId]
-local so, tuff = pcall(function()
-    return loadstring(game:HttpGet(base..file))()
+
+if not file then
+    warn("* Rendex * Unsupported PlaceId:", game.PlaceId)
+    return
+end
+
+local success, err = pcall(function()
+    loadstring(game:HttpGet(base .. file))()
 end)
-if so then
+
+if success then
     print("* Rendex * Loaded:", file)
 else
-    warn("* Rendex * Failed:", tuff)
+    warn("* Rendex * Failed:", err)
 end
