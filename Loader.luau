@@ -18,11 +18,19 @@ if not file then
 end
 
 local success, err = pcall(function()
-    loadstring(game:HttpGet(base .. file))()
+    local source = game:HttpGet(base .. file)
+    local func = loadstring(source)
+
+    if not func then
+        error("Failed to compile " .. file)
+    end
+
+    func()
 end)
 
 if success then
     print("* Rendex * Loaded:", file)
 else
-    warn("* Rendex * Failed:", err)
+    warn("* Rendex * Failed:", file)
+    warn(err)
 end
