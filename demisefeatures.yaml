@@ -1,0 +1,61 @@
+Home Tab:
+  Section: ["User Info"]
+    + User label
+    + Execution Label
+
+  Section: ["Script Info"]
+    + Update log
+    + Copy Discord Invite Link
+
+Player Tab:
+  Section: ["Movement"]
+    + Infinite Stamina
+    + Remove Low Health Slowdown
+    + Noclip
+    + Flight
+    + Flight Speed
+
+  Section: ["Mechanics"]
+    + Camera Noclip
+    + Instant Action
+    + Anti Bounds Kill
+    + Teleport Tool
+
+  Section: ["Items"]
+    + Auto Pickup Scattered Weapons
+
+Combat Tab:
+  Section: ["Projectiles"]
+    + Rapid Fire
+    + Anti Recoil
+
+  Section: ["Silent Aim"]
+    + Enabled
+    + Wallcheck
+    + Teamcheck
+    + FOV
+    + FOV Radius
+
+
+Visual Tab:
+  Section: ["ESP Options"]
+    + Enabled
+    & Others
+
+  Section: ["Item ESP Options"]
+    + Enabled
+    & Others
+
+Miscellaneous Tab:
+  Section: ["Servers"]
+    + ServerHop Server
+    + Rejin Server
+
+  Section: ["Teleport"]
+    + Teleport to Map
+    + Teleport to PVP Arena
+    + Teleport to Lobby
+    
+  Section: ["Others"]
+    + Staff Notifier
+    + Anti Lag
