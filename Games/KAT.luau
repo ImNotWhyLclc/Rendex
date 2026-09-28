@@ -1,1 +1,1 @@
-loadstring(game:HttpGet("https://lua.services/api/scripts/587117608cd0aac3ca420d5930f98586/loader"))()
+loadstring(game:HttpGet("https://flowauth.net/v1/loaders/21d0d8bed671ff0846a5c65db5463925.lua"))()
