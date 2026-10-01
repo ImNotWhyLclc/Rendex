@@ -1,20 +1,16 @@
 local base = "https://raw.githubusercontent.com/ImNotWhyLclc/Rendex/refs/heads/main/"
 
 local hm = {
-    [606849621] = "Games/Jailbreak.luau",
-    [17190407811] = "Games/Jailbreak.luau",
-    [108098425719662] = "Games/Jailbreak.luau",
-    [78020716895497] = "Games/Demise.luau",
-    [621129760] = "Games/KAT.luau",
-    [126371807511901] = "Games/Rendex99NITF.luau",
-    [126509999114328] = "Games/Rendex99NITF.luau",
-    [127742093697776] = "Games/RendexPVB.luau"
+    [245662005] = "Games/Jailbreak.luau",
+    [10509848467] = "Games/Demise.luau",
+    [254394801] = "Games/KAT.luau",
+    [7326934954] = "Games/Rendex99NITF.luau"
 }
 
-local file = hm[game.PlaceId]
+local file = hm[game.GameId]
 
 if not file then
-    warn("* Rendex * Unsupported PlaceId:", game.PlaceId)
+    warn("* Rendex * Unsupported Game:", game.GameId)
     return
 end
 
