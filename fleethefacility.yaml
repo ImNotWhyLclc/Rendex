@@ -1,0 +1,23 @@
+Player Tab:
+  Section: ["Movement"]
+    + Walkspeed
+    + Flight
+    + Noclip
+
+  Section: ["Mechanics"]
+    + Suicide
+    + Anti Computer Error
+
+Visuals Tab:
+  Section: ["ESP"]
+    + Player ESP
+    + Locker ESP
+    + Freeze Pod ESP
+    + Exit Door ESP
+    + Vent ESP
+    + Computer ESP
+
+Miscellaneous Tab:
+  Section: ["Servers"]
+    + Server Hop
+    + Rejoin Server
