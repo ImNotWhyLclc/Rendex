@@ -2,6 +2,7 @@ local base = "https://raw.githubusercontent.com/ImNotWhyLclc/Rendex/refs/heads/m
 
 local hm = {
     [245662005] = "Games/Jailbreak.luau",
+    [372226183] = "Games/FleeTheFacility.luau",
     [10509848467] = "Games/Demise.luau",
     [254394801] = "Games/KAT.luau",
     [7326934954] = "Games/Rendex99NITF.luau"
