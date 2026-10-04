@@ -13,7 +13,7 @@ local yay = {
     [10549820578] = "Games/Doors.luau",
     [87716067947993] = "Games/Doors.luau",
     [110258689672367] = "Games/Doors.luau",
-    [6516141723] = "Games/DoorsLobby.luau"
+    [6516141723] = "Games/DoorsLobby.luau",
     [12308344607] = "Games/DoorsVCLobby.luau"
 }
 
