@@ -9,10 +9,14 @@ local hm = {
     [7326934954] = "Games/Rendex99NITF.luau"
 }
 
-local file = hm[game.GameId]
+local yay = {
+    [2449081] = "Games/DoorsLobby.luau"
+}
+
+local file = yay[game.PlaceId] or hm[game.GameId]
 
 if not file then
-    warn("* Rendex * Unsupported Game:", game.GameId)
+    warn("* Rendex * Unsupported Game:", game.GameId, "Place:", game.PlaceId)
     return
 end
 
