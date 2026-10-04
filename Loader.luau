@@ -3,14 +3,18 @@ local base = "https://raw.githubusercontent.com/ImNotWhyLclc/Rendex/refs/heads/m
 local hm = {
     [245662005] = "Games/Jailbreak.luau",
     [372226183] = "Games/FleeTheFacility.luau",
-    [2440500124] = "Games/Doors.luau",
     [10509848467] = "Games/Demise.luau",
     [254394801] = "Games/KAT.luau",
     [7326934954] = "Games/Rendex99NITF.luau"
 }
 
 local yay = {
-    [2449081] = "Games/DoorsLobby.luau"
+    [6839171747] = "Games/Doors.luau",
+    [10549820578] = "Games/Doors.luau",
+    [87716067947993] = "Games/Doors.luau",
+    [110258689672367] = "Games/Doors.luau",
+    [6516141723] = "Games/DoorsLobby.luau"
+    [12308344607] = "Games/DoorsVCLobby.luau"
 }
 
 local file = yay[game.PlaceId] or hm[game.GameId]
