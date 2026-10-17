@@ -1,21 +1,17 @@
 ## Support Rendex
 
-Rendex is free to use. If you enjoy the project and want to support its development, you can donate using any of the cryptocurrencies below.
+Rendex is free. If you enjoy it, you can support development with a donation:
 
-| Coin | Ticker | Address |
-|---|---|---|
-| Bitcoin | BTC | `bc1qf07mrtsqdwlg9207whprc0pqnkarkeegvqcm2k` |
-| Ethereum | ETH | `0xc8855835d25fDa581695aC7F207f2fb03ae0F3B8` |
-| Litecoin | LTC | `LVoixxDrAj75WY68ySNQr5KkjZLeKJ4bqZ` |
-| Solana | SOL | `4Bquk3pvMLSkzSuJ8XQFFZLgepAkXQq9puYwWhGGWtYG` |
+| Coin | Address |
+| :--- | :--- |
+| <img src="https://raw.githubusercontent.com/ImNotWhyLclc/Main/main/Icons/Crypto/btc.svg" width="20" /> **Bitcoin** | `bc1qf07mrtsqdwlg9207whprc0pqnkarkeegvqcm2k` |
+| <img src="https://raw.githubusercontent.com/ImNotWhyLclc/Main/main/Icons/Crypto/eth.svg" width="20" /> **Ethereum** | `0xc8855835d25fDa581695aC7F207f2fb03ae0F3B8` |
+| <img src="https://raw.githubusercontent.com/ImNotWhyLclc/Main/main/Icons/Crypto/ltc.svg" width="20" /> **Litecoin** | `LVoixxDrAj75WY68ySNQr5KkjZLeKJ4bqZ` |
+| <img src="https://raw.githubusercontent.com/ImNotWhyLclc/Main/main/Icons/Crypto/sol.svg" width="20" /> **Solana** | `4Bquk3pvMLSkzSuJ8XQFFZLgepAkXQq9puYwWhGGWtYG` |
 
-**Important:** Send each cryptocurrency using its corresponding network. Transactions sent through an incompatible network may result in permanent loss of funds.
+Send each coin on its own network only. Coins sent on the wrong network can't be recovered.
 
-### Donor Role
-
-If you've donated, ping me in <#1510040905132806294> to claim the <@&1546345102996283543> role.
-
-Thank you for supporting Rendex and helping keep development going!
+Ping me in <#1510040905132806294> if you donated to receive the <@&1546345102996283543> role!
 
 ### Loader
 
