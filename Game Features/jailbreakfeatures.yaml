@@ -1,0 +1,217 @@
+Player Tab:
+  Section: ["Movement"]
+    + Player Flight
+    + Flight Speed
+    + Always Sprinting
+    + Always Juiced
+    + Noclip
+    + Infinite Jump
+
+  Section: ["Interactions"]
+    + Pickpocket Aura
+    + Arrest Aura
+    + Breakout Aura
+
+  Section: ["Mechanics"]
+    + Anti Ragdoll
+    + Anti Fall Injury
+    + Anti Skydiving
+    + Anti Ragdoll Stun
+    + Anti Injury Slow
+    + Anti Crawling Slow
+    + Allow Equip When Crawling
+    + Anti Locked Items
+    + Anti Spotlight Slow
+    + Enable Movement Roll
+    + Anti Roll Cooldown
+    + Anti Circle Action Wait
+    + Circle Anti Clipping
+
+  Section: ["Minimap"]
+    + Anti Minimap Flash
+    + Always Show Player Marker
+
+Vehicle Tab:
+  Section: ["General"]
+    + Vehicle Flight
+    + Flight Speed
+    + Add Jump Action
+    + Anti Jump Action Wait
+    + Infinite Nitro
+
+  Section: ["Car"]
+    + Engine Speed
+    + Apply Engine Speed
+    + Brakes
+    + Apply Breaks
+    + Suspension Height
+    + Apply Suspension Height
+    + Turn Speed
+    + Apply Turn Speed
+    + Anti Tire Pop
+    + Drive On Water
+    + Always Flip
+    + Instant Tow
+
+  Section: ["Helicopter"]
+    + Engine Forward Speed
+    + Engine Vertical Speed
+    + Apply Modification
+    + Instant Heli Pickup
+    + Anti Heli Down
+    + Infinite Heli Height
+
+  Section: ["Garage"]
+    + Choose Save Slot
+    + Load Save Slot
+    + Auto Load Save Slot
+    + Auto Load Last Selection
+    + Always Show Favorited
+
+  Section: ["Motorbike"]
+    + Speed Multiplier
+    + Suspension Height Multiplier
+
+  Section: ["Tank"]
+    + Tracks Height
+
+  Section: ["Volt"]
+    + Speed Multiplier
+    + Wheel Height
+    + Anti Pop Tire
+
+Robberies Tab:
+  Section: ["General"]
+    + Disable Bandit Damage  
+    + Auto Solve Puzzle
+    + Solve Delay
+
+  Section: ["Bank"]
+    + Disable Lasers
+    + Auto Place Dynamite
+
+  Section: ["Jewelry Store"]
+    + Disable Lasers
+
+  Section: ["Museum"]
+    + Disable Lasers
+
+  Section: ["Casino"]
+    + Code Display
+    + Copy Code
+    + Auto Notify Code
+    + Disable Lasers
+    + Hack Computer
+    + Auto Collect Cash
+    + Auto Open Door
+    + Choose Elevator Floor
+    + Call Elevator
+
+  Section: ["Tomb"]
+    + Disable Planks
+    + Disable Spikes
+    + Disable Darts
+    + Disable Bridge Break
+    + Disable Lava
+
+  Section: ["Oil Rig"]
+    + Disable Lasers
+    + Disable Turret
+    + Disable Self Destruct
+
+  Section: ["Cargo Ship"]
+    + Disable Turret
+
+  Section: ["Mansion"]
+    + Disable Lasers
+    + Disable Traps
+    + Auto Enter Elevator
+    + Invites Counter
+
+  Section: ["Power Plant"]
+    + Disable Lasers
+    + Disable Pistons
+
+Combat Tab:
+  Section: ["Utilities"]
+    + Instant Reload
+    + Plasma Wallbang
+    + Always Auto
+    + Anti Recoil
+    + Anti Spread
+    + Anti Equip Time
+    + Bullet Criticals
+    + Instant Bullet Hit
+    + Increase Takedown Damage
+    + Shoot Through Forcefield
+    + Rocket Instant Seek
+    + Free Pistol Swat
+    + Fast Taser
+    + Faster Forcefield Reload
+    + Anti Forcefield Misses
+    + Anti Smoke Grenade Effect
+    + Anti Smoke Grenade Limit
+
+  Section: ["Melee"]
+    + Anti Reload Time
+    + Always Swoosh
+    + Always Lunge
+
+  Section: ["Silent Aim"]
+    + Enabled
+    + Include NPCs
+    + Wallcheck
+    + Include Taser
+    + Include Plasma
+    + FOV Circle
+    + FOV Circle Filled
+    + Range
+    + Radius
+
+  Section: ["Gun Store"]
+    + Get All Owned Gun
+    + Open Gunstore UI
+
+Visual Tab:
+  Section: ["ESP Options"]
+    + Enabled
+    + Bounties
+    + Box
+    + Tracer
+    + Name
+    + Distance
+    + Health
+    + Skeleton
+
+  Section: ["ESP Settings"]
+    + Team Check
+    + Use Team Color
+    + Rainbow
+    + Text Outline
+    + Text Size
+    + Tracer Origins
+
+  Section: ["Airdrop ESP Options"]
+    + Enabled
+    + Tracer
+    + Name
+    + Distance
+
+  Section: ["Airdrop ESP Settings"]
+    + Rainbow
+    + Text Outline
+    + Airdrop Text Size
+    + Tracer Origins
+
+Miscellaneous Tab:
+  Section: ["Military"]
+    + Disable Military Turrets
+
+  Section: ["Protections"]
+    + Disable Home Turret
+
+  Section: ["Fun"]
+    + Open All Doors & Gates
+    + Open All Sewer Hatch
+    + Break Prison Elevator
+    + Break Casino Elevator
