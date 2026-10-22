@@ -1,0 +1,43 @@
+Player Tab:
+  Section: ["Movement"]
+    + Walkspeed
+    + Speed Value
+    + Infinite Jump 
+    + Flight
+    + Flight Speed
+    + Noclip
+
+Combat Tab:
+  Section: ["Silent Aim"]
+    + Enabled
+    + Wallcheck
+    + FOV Circle
+    + FOV Radius
+    + Target Part
+
+Visuals Tab:
+  Section: ["ESP Options"]
+    + Enabled
+    + Bounty
+    + Box
+    + Tracer
+    + Name
+    + Distance
+    + Health
+    + Skeleton
+    
+  Section: ["ESP Settings"]
+    + Team check
+    + Use Team Color
+    + Rainbow
+    + Text Outline
+    + Text Size
+    + Tracer Origins
+
+Miscellaneous Tab:
+  Section: ["Servers"]
+    + ServerHop Server
+    + Rejoin Server
+    
+  Section: ["Others"]
+    + Anti Lag
