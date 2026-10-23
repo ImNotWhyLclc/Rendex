@@ -152,6 +152,13 @@
   "Keep Notifications": "Mantener Notificaciones",
   "Test Notification": "Probar Notificación",
 
+  "Auto Padlock: Entered code {code}": "Candado Automático: Código {code} introducido",
+  "Library Code Found: {code}": "Código de Biblioteca Encontrado: {code}",
+  "Teleported to door {n}": "Teletransportado a la puerta {n}",
+  "Loaded in {time} seconds!": "¡Cargado en {time} segundos!",
+  "has spawned!": "ha aparecido!",
+  "Loading": "Cargando"
+  
   "Loaded in {t} seconds!": "¡Cargado en {t} segundos!",
   "Right shift to open": "Shift derecho para abrir",
 
