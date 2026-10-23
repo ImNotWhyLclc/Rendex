@@ -152,6 +152,13 @@
   "Keep Notifications": "Сохранять Уведомления",
   "Test Notification": "Тестовое Уведомление",
 
+  "Auto Padlock: Entered code {code}": "Авто Замок: Введён код {code}",
+  "Library Code Found: {code}": "Код Библиотеки Найден: {code}",
+  "Teleported to door {n}": "Телепорт к двери {n}",
+  "Loaded in {time} seconds!": "Загружено за {time} секунд!",
+  "has spawned!": "появился!",
+  "Loading": "Загрузка"
+
   "Loaded in {t} seconds!": "Загружено за {t} секунд!",
   "Right shift to open": "Правый Shift для открытия",
 
