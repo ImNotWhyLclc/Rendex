@@ -1,3 +1,11 @@
+Home Tab:
+  Section: ["User Info"]
+  + Profile Picture
+  + Username Display
+  + Execution Count
+  + Changelog / Update Notes
+  + Copy Discord Invite Link
+  
 Player Tab:
   Section: ["Movement"]
     + Walkspeed
