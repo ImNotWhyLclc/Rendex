@@ -1,8 +1,11 @@
 Home Tab:
   + Profile Picture
-  + Username Display
-  + Execution Count
-  + Changelog / Update Notes
+  + Username
+  + Account Age
+  + User ID
+  + Executor
+  + Executions
+  + Changelog
   + Copy Discord Invite Link
 
 Main Tab:
@@ -79,6 +82,9 @@ Player Tab:
 Floors Tab:
   + Seek Path
   + Eyestalk Path
+  + Show Vault Combination
+  + Auto Crack Vault
+  + Auto Abstain Terminal
 
 Visuals Tab:
   + Player ESP
@@ -108,3 +114,14 @@ Visuals Tab:
   + No Camera Shake
   + FOV Changer
   + FOV Value
+
+Miscellaneous Tab:
+  + Anti Lag
+
+Settings Tab:
+  + Menu Bind
+  + Open Keybind Menu
+  + Execute on Serverhop
+  + DPI Scale
+  + Unload
+  + Discord
