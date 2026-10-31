@@ -1,225 +1,394 @@
 Home Tab:
-  Section: ["User Info"]
+  Section: ["Profile"]
   + Profile Picture
-  + Username Display
-  + Execution Count
-  + Changelog / Update Notes
-  + Copy Discord Invite Link
-  
+  + Username
+  + Account Age
+  + User ID
+  + Executor
+  + Executions
+  + Streamer Mode
+  + Session Time
+  + Youtube
+  + Discord
+
+  Section: ["Changelog"]
+  + Update Summary
+  + Changelog
+
 Player Tab:
   Section: ["Movement"]
-    + Player Flight
-    + Flight Speed
-    + Always Sprinting
-    + Always Juiced
-    + Noclip
-    + Infinite Jump
+  + Player Flight
+  + Flight Speed
+  + Always Sprinting
+  + Always Juiced
+  + Noclip
+  + Infinite Jump
 
   Section: ["Interactions"]
-    + Pickpocket Aura
-    + Arrest Aura
-    + Breakout Aura
-
-  Section: ["Mechanics"]
-    + Anti Ragdoll
-    + Anti Fall Injury
-    + Anti Skydiving
-    + Anti Ragdoll Stun
-    + Anti Injury Slow
-    + Anti Crawling Slow
-    + Allow Equip When Crawling
-    + Anti Locked Items
-    + Anti Spotlight Slow
-    + Enable Movement Roll
-    + Anti Roll Cooldown
-    + Anti Circle Action Wait
-    + Circle Anti Clipping
+  + Anti Circle Hold
+  + Circle Anti Clipping
+  + Arrest Aura
+  + Eject Aura
+  + Search Criminal Aura
+  + Pickpocket Aura
+  + Breakout Aura
+  + Auto Collect Cash
+  + Cash Collect Range
 
   Section: ["Minimap"]
-    + Anti Minimap Flash
-    + Always Show Player Marker
+  + Anti Minimap Flash
+  + Anti Player Marker Flash
+  + Airdrop Marker
+
+  Section: ["Dog Mods"]
+  + German Shepherd Multiplier
+  + Bulldog Multiplier
+
+  Section: ["Mechanics"]
+  + Anti Punch Cooldown
+  + Anti Ragdoll
+  + Anti Fall Injury
+  + Anti Skydiving
+  + Anti Ragdoll Stun
+  + Anti Injury Slow
+  + Anti Crawling Slow
+  + Anti Spotlight Slow
+  + Allow Equip When Crawling
+  + Anti Locked Items
+
+  Section: ["Jetpack"]
+  + Infinite Jetpack Fuel
+  + Faster Jetpack
+  + Allow Equip While Flying
+  + Bypass Fly Zones
+
+  Section: ["Consumables"]
+  + Instant Donut Consume
+
+Combat Tab:
+  Section: ["Projectiles"]
+  + Instant Reload
+  + Auto Kill Bandit
+  + Bandit Instant Kill
+  + Always Auto
+  + Anti Recoil
+  + Anti Spread
+  + Anti Equip Time
+  + Anti Sniper Scope UI
+  + Instant Bullet Hit
+  + Rocket Instant Seek
+  + Free Swat Pistol
+  + Fast Taser
+  + Faster Forcefield Reload
+  + Anti Forcefield Misses
+  + Shoot Through Forcefield
+
+  Section: ["Melee"]
+  + Anti Reload Time
+  + Always Swoosh
+  + Always Lunge
+  + Lunge Chance
+
+  Section: ["Silent Aim"]
+  + Enabled
+  + Target Part
+  + Wallcheck
+  + Include Car Turret
+  + Include Bandits
+  + Include Taser
+  + Include Plasma
+  + Friendly Fire
+  + FOV Circle
+  + FOV Circle Filled
+  + Radius
+
+  Section: ["Explosives"]
+  + Smoke Grenade Throw Speed
+  + Grenade Throw Speed
+  + Grenade Fuse Time
+  + Anti Throw Cooldown
+  + Anti Smoke Effect
+  + Anti Smoke Limit
+
+  Section: ["Gun Store"]
+  + Grab All Owned Guns
+  + Open Gunstore UI
+
+  Section: ["Car Turret"]
+  + Anti Overheat
+  + Fast Bullet
+  + Follow Mouse
+
+  Section: ["Loadout"]
+  + Slot 1
+  + Slot 2
+  + Slot 3
+  + Slot 4
+  + Slot 5
+  + Slot 6
+  + Slot 7
+  + Slot 8
+  + Slot 9
+  + Slot 10
+  + Auto Loadout
+  + Auto Grab Loadout
+  + Auto Drop Unselected
 
 Vehicle Tab:
   Section: ["General"]
-    + Vehicle Flight
-    + Flight Speed
-    + Add Jump Action
-    + Anti Jump Action Wait
-    + Infinite Nitro
+  + Vehicle Flight
+  + Flight Speed
+  + Add Jump Action
+  + Anti Jump Action Wait
+  + Infinite Nitro
+  + Destructibles Aura
+  + Destructibles Range
+  + Pit Aura
+  + Pit Aura Range
 
   Section: ["Car"]
-    + Engine Speed
-    + Apply Engine Speed
-    + Brakes
-    + Apply Breaks
-    + Suspension Height
-    + Apply Suspension Height
-    + Turn Speed
-    + Apply Turn Speed
-    + Anti Tire Pop
-    + Drive On Water
-    + Always Flip
-    + Instant Tow
+  + Engine Speed
+  + Apply Engine Speed
+  + Brakes
+  + Apply Breaks
+  + Suspension Height
+  + Apply Suspension Height
+  + Turn Speed
+  + Apply Turn Speed
+  + Anti Tire Pop
+  + Drive On Water
+  + Auto Pilot
+  + Always Flip
+  + Always Drift
+  + Infinite Traction
+  + Instant Tow
 
   Section: ["Helicopter"]
-    + Engine Forward Speed
-    + Engine Vertical Speed
-    + Apply Modification
-    + Instant Heli Pickup
-    + Anti Heli Down
-    + Infinite Heli Height
+  + Engine Forward Speed
+  + Engine Vertical Speed
+  + Apply Modification
+  + Instant Heli Pickup
+  + Anti Heli Takedown
+  + Infinite Heli Height
 
   Section: ["Garage"]
-    + Choose Save Slot
-    + Load Save Slot
-    + Auto Load Save Slot
-    + Auto Load Last Selection
-    + Always Show Favorited
+  + Choose Save Slot
+  + Load Save Slot
+  + Auto Load Save Slot
+  + Auto Load Last Selection
+  + Always Show Favorited
+
+  Section: ["Garage Customization"]
+  + Body Color
+  + Second Body Color
+  + Texture
+  + Interior Detail
+  + Interior Main
+  + Wheel Color
+  + Rim
+  + Spoiler
+  + Spoiler Color
+  + Tire Style
+  + Horn
+  + Drifts
+  + Auto Apply
+  + Apply
+
+  Section: ["Plane"]
+  + Speed Multiplier
+  + Apply Speed
+  + Infinite Plane Height
+  + Instant Takeoff
+  + Anti Roll Correction
+
+  Section: ["Boat"]
+  + Speed Multiplier
+  + Turn Speed
+  + Apply Speed
+  + Apply Turn Speed
+  + Anti Boat Takedown
+  + Drive on Land
 
   Section: ["Motorbike"]
-    + Speed Multiplier
-    + Suspension Height Multiplier
+  + Speed Multiplier
+  + Suspension Height Multiplier
 
   Section: ["Tank"]
-    + Tracks Height
+  + Tracks Height
 
   Section: ["Volt"]
-    + Speed Multiplier
-    + Wheel Height
-    + Anti Pop Tire
+  + Speed Multiplier
+  + Wheel Height
+  + Anti Pop Tire
 
 Robberies Tab:
   Section: ["General"]
-    + Disable Bandit Damage  
-    + Auto Solve Puzzle
-    + Solve Delay
+  + Disable Bandit Damage
+  + Auto Solve Puzzle
+  + Solve Delay
 
   Section: ["Bank"]
-    + Disable Lasers
-    + Auto Place Dynamite
+  + Disable Lasers
+  + Auto Place Dynamite
 
   Section: ["Jewelry Store"]
-    + Disable Lasers
+  + Disable Lasers
+  + Auto Grab Jewel
+  + Anti Door Lock
 
   Section: ["Museum"]
-    + Disable Lasers
-
-  Section: ["Casino"]
-    + Code Display
-    + Copy Code
-    + Auto Notify Code
-    + Disable Lasers
-    + Hack Computer
-    + Auto Collect Cash
-    + Auto Open Door
-    + Choose Elevator Floor
-    + Call Elevator
-
-  Section: ["Tomb"]
-    + Disable Planks
-    + Disable Spikes
-    + Disable Darts
-    + Disable Bridge Break
-    + Disable Lava
-
-  Section: ["Oil Rig"]
-    + Disable Lasers
-    + Disable Turret
-    + Disable Self Destruct
-
-  Section: ["Cargo Ship"]
-    + Disable Turret
-
-  Section: ["Mansion"]
-    + Disable Lasers
-    + Disable Traps
-    + Auto Enter Elevator
-    + Invites Counter
+  + Disable Lasers
+  + Auto Grab
+  + Auto Place Dynamite
+  + Auto Solve Puzzle
 
   Section: ["Power Plant"]
-    + Disable Lasers
-    + Disable Pistons
+  + Disable Lasers
+  + Disable Pistons
 
-Combat Tab:
-  Section: ["Utilities"]
-    + Instant Reload
-    + Plasma Wallbang
-    + Always Auto
-    + Anti Recoil
-    + Anti Spread
-    + Anti Equip Time
-    + Bullet Criticals
-    + Instant Bullet Hit
-    + Increase Takedown Damage
-    + Shoot Through Forcefield
-    + Rocket Instant Seek
-    + Free Pistol Swat
-    + Fast Taser
-    + Faster Forcefield Reload
-    + Anti Forcefield Misses
-    + Anti Smoke Grenade Effect
-    + Anti Smoke Grenade Limit
+  Section: ["Tomb"]
+  + Disable Planks
+  + Disable Spikes
+  + Disable Darts
+  + Disable Bridge Break
+  + Disable Lava
+  + Auto Duck
+  + Auto Sit Cart
 
-  Section: ["Melee"]
-    + Anti Reload Time
-    + Always Swoosh
-    + Always Lunge
+  Section: ["Casino"]
+  + Code Display
+  + Copy Code
+  + Auto Notify Code
+  + Disable Lasers
+  + Hack Computer
+  + Auto Collect Cash
+  + Auto Crack Vault
+  + Auto Open Door
+  + Auto Open Door Cooldown
+  + Choose Elevator Floor
+  + Call Elevator
 
-  Section: ["Silent Aim"]
-    + Enabled
-    + Include NPCs
-    + Wallcheck
-    + Include Taser
-    + Include Plasma
-    + FOV Circle
-    + FOV Circle Filled
-    + Range
-    + Radius
+  Section: ["Oil Rig"]
+  + Disable Lasers
+  + Auto Grab Keycard
+  + Disable Turret
+  + Disable Self Destruct
 
-  Section: ["Gun Store"]
-    + Get All Owned Gun
-    + Open Gunstore UI
+  Section: ["Cargo Ship"]
+  + Disable Turret
+
+  Section: ["Cargo Train"]
+  + Auto Breach Vault
+
+  Section: ["Passenger Train"]
+  + Auto Grab
+
+  Section: ["Mansion"]
+  + Disable Lasers
+  + Disable Traps
+  + Bandit Target Boss
+  + Anti Boss Attack
+  + Auto Enter Elevator
+  + Invites Counter
+
+  Section: ["Robbery Statuses"]
+  + Bank Status
+  + Jewelry Status
+  + Museum Status
+  + Power Plant Status
+  + Tomb Status
+  + Crown Jewel Status
+  + Mansion Status
+  + Passenger Train Status
+  + Cargo Train Status
+  + Cargo Plane Status
+  + Cargo Ship Status
+  + Bank Truck Status
+  + Donut Store Status
+  + Gas Station Status
+  + Epic Grocery Status
+  + Oil Rig Status
+  + Airdrop Status
+  + Pop In / Out
+  + Pop Out Width
+  + Notify On Open
+  + Hide Closed Robberies
 
 Visual Tab:
+  Section: ["Camera"]
+  + FOV Changer
+  + FOV
+  + Fullbright
+  + Time Changer
+  + Time
+  + Sky Color
+
   Section: ["ESP Options"]
-    + Enabled
-    + Bounties
-    + Box
-    + Tracer
-    + Name
-    + Distance
-    + Health
-    + Skeleton
+  + Enabled
+  + Bounties
+  + Box
+  + Tracer
+  + Name
+  + Health
+  + Skeleton
+  + Distance
+  + Distance Unit
 
   Section: ["ESP Settings"]
-    + Team Check
-    + Use Team Color
-    + Rainbow
-    + Text Outline
-    + Text Size
-    + Tracer Origins
+  + Team Check
+  + Use Team Color
+  + Rainbow
+  + Text Outline
+  + Text Size
+  + Tracer Origins
 
   Section: ["Airdrop ESP Options"]
-    + Enabled
-    + Tracer
-    + Name
-    + Distance
+  + Enabled
+  + Tracer
+  + Name
+  + Distance
 
   Section: ["Airdrop ESP Settings"]
-    + Rainbow
-    + Text Outline
-    + Airdrop Text Size
-    + Tracer Origins
+  + Rainbow
+  + Text Outline
+  + Airdrop Text Size
+  + Tracer Origins
 
 Miscellaneous Tab:
+  Section: ["Money Spoofer"]
+  + Amount
+  + Apply Money Spoofer
+  + Disable Money Spoofer
+
+  Section: ["Servers"]
+  + Server Hop
+  + Rejoin Server
+  + Voice Chat Server
+  + High Roller Server
+  + Trade Server
+  + Job ID
+  + Join Server by Job ID
+
   Section: ["Military"]
-    + Disable Military Turrets
+  + Disable Military Turret
+  + Disable Military Forcefield
 
   Section: ["Protections"]
-    + Disable Home Turret
+  + Disable Home Turret
+
+  Section: ["Spectate"]
+  + Select Player
+  + Spectate
+  + Unspectate
+
+  Section: ["Serverhop Until Bounty"]
+  + Target Total Bounty
+  + Serverhop Cooldown
+  + Serverhop Until Bounty
 
   Section: ["Fun"]
-    + Open All Doors & Gates
-    + Open All Sewer Hatch
-    + Break Prison Elevator
-    + Break Casino Elevator
+  + Break Prison Elevator
+  + Break Casino Elevator
+
+  Section: ["Others"]
+  + Anti Lag
