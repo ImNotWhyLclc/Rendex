@@ -11,7 +11,9 @@ Rendex is free. If you enjoy it, you can support development with a donation:
 
 Send each coin on its own network only. Coins sent on the wrong network can't be recovered.
 
-Join The https://discord.gg/X4GW8N5GdW And Ping me in https://discord.com/channels/1377874807319826525/1558461911157440696 if you donated to receive the <@&1546345102996283543> role!
+Join The [Discord](https://discord.gg/X4GW8N5GdW) And Ping me in [Chat](https://discord.com/channels/1377874807319826525/1558461911157440696) if you donated to receive the Supporter role!
+
+[![Reviewed on ScriptBlox](https://scriptblox.com/badge/Universal-Script-Rendex-Hub-Keyless-6-Games-Supported-234087)](https://scriptblox.com/script/Universal-Script-Rendex-Hub-Keyless-6-Games-Supported-234087)
 
 ### Loader
 
